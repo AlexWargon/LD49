@@ -57,3 +57,4 @@ Assets/Plugins/Editor/JetBrains/
 **/.idea
 session.data
 Logs
+.vsconfig
