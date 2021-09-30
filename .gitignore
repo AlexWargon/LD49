@@ -44,3 +44,15 @@ sysinfo.txt
 *.unitypackage
 Assets/Plugins/Editor.meta
 .vscode/settings.json
+
+/.idea/
+Assets/Plugins/Editor/JetBrains.meta
+Assets/Plugins/Editor/JetBrains/Unity3DRider.cs
+Assets/Plugins/Editor/JetBrains/Unity3DRider.cs.meta
+Assets/Plugins/Editor/JetBrains/
+
+#Automated Testing
+**/.vs
+**/obj
+**/.idea
+session.data
