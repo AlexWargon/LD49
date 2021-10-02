@@ -218,6 +218,9 @@ public class ProjectileMoveSystem : UpdateSystem
         entities.Without<UnActive>().Each((ref Direction direction,ref MoveSpeed speed, TransformRef transform) =>
         {
             transform.Value.position += direction.Value * speed.Value * dt;
+            Vector3 pos = transform.Value.position;
+            pos.y += -0.5f * dt;
+            transform.Value.position = pos;
         });
     }
 }

@@ -103,3 +103,10 @@ public class SphereCastRef
 }
 [EcsComponent]
 public class SphereInWeapon{}
+
+[EcsComponent]
+public class RookRef
+{
+    public Rigidbody RigidbodyRef;
+}
+
