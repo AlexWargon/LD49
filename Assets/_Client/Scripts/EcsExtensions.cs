@@ -74,7 +74,110 @@ public static class EcsExtensions
         for (var index = 0; index < entityType.Count; index++)
             lambda(ref a[entities[index]]);
     }
-
+    public static void Each<A,B,NA>(this Entities.EntitiesWithout<NA> ezs, LambdaRef<A,B> lambda)
+    {
+        var entityType = ezs.GetEntityTypeWithout<A,B>();
+        var entities = entityType.entities;
+        var a = entityType.poolA.items;
+        var b = entityType.poolB.items;
+        for (var index = 0; index < entityType.Count; index++)
+            lambda(ref a[entities[index]],
+                ref b[entities[index]]);
+    }
+    public static void Each<A,B,C,NA>(this Entities.EntitiesWithout<NA> ezs, LambdaRef<A,B,C> lambda)
+    {
+        var entityType = ezs.GetEntityTypeWithout<A,B,C>();
+        var entities = entityType.entities;
+        var a = entityType.poolA.items;
+        var b = entityType.poolB.items;
+        var c = entityType.poolС.items;
+        for (var index = 0; index < entityType.Count; index++)
+            lambda(ref a[entities[index]],
+                ref b[entities[index]],
+                ref c[entities[index]]);
+    }
+    public static void Each<A,B,C,D,NA>(this Entities.EntitiesWithout<NA> ezs, LambdaRef<A,B,C,D> lambda)
+    {
+        var entityType = ezs.GetEntityTypeWithout<A,B,C,D>();
+        var entities = entityType.entities;
+        var a = entityType.poolA.items;
+        var b = entityType.poolB.items;
+        var c = entityType.poolС.items;
+        var d = entityType.poolD.items;
+        for (var index = 0; index < entityType.Count; index++)
+            lambda(ref a[entities[index]],
+                ref b[entities[index]],
+                ref c[entities[index]],
+                ref d[entities[index]]);
+    }
+    public static void Each<A,B,C,D,E,NA>(this Entities.EntitiesWithout<NA> ezs, LambdaRef<A,B,C,D,E> lambda)
+    {
+        var entityType = ezs.GetEntityTypeWithout<A,B,C,D,E>();
+        var entities = entityType.entities;
+        var a = entityType.poolA.items;
+        var b = entityType.poolB.items;
+        var c = entityType.poolС.items;
+        var d = entityType.poolD.items;
+        var e = entityType.poolE.items;
+        for (var index = 0; index < entityType.Count; index++)
+            lambda(ref a[entities[index]],
+                ref b[entities[index]],
+                ref c[entities[index]],
+                ref d[entities[index]],
+                ref e[entities[index]]);
+    }
+        public static void Each<A,B,NA,NB>(this Entities.EntitiesWithout<NA,NB> ezs, LambdaRef<A,B> lambda)
+    {
+        var entityType = ezs.GetEntityTypeWithout<A,B>();
+        var entities = entityType.entities;
+        var a = entityType.poolA.items;
+        var b = entityType.poolB.items;
+        for (var index = 0; index < entityType.Count; index++)
+            lambda(ref a[entities[index]],
+                ref b[entities[index]]);
+    }
+    public static void Each<A,B,C,NA,NB>(this Entities.EntitiesWithout<NA,NB> ezs, LambdaRef<A,B,C> lambda)
+    {
+        var entityType = ezs.GetEntityTypeWithout<A,B,C>();
+        var entities = entityType.entities;
+        var a = entityType.poolA.items;
+        var b = entityType.poolB.items;
+        var c = entityType.poolС.items;
+        for (var index = 0; index < entityType.Count; index++)
+            lambda(ref a[entities[index]],
+                ref b[entities[index]],
+                ref c[entities[index]]);
+    }
+    public static void Each<A,B,C,D,NA,NB>(this Entities.EntitiesWithout<NA,NB> ezs, LambdaRef<A,B,C,D> lambda)
+    {
+        var entityType = ezs.GetEntityTypeWithout<A,B,C,D>();
+        var entities = entityType.entities;
+        var a = entityType.poolA.items;
+        var b = entityType.poolB.items;
+        var c = entityType.poolС.items;
+        var d = entityType.poolD.items;
+        for (var index = 0; index < entityType.Count; index++)
+            lambda(ref a[entities[index]],
+                ref b[entities[index]],
+                ref c[entities[index]],
+                ref d[entities[index]]);
+    }
+    public static void Each<A,B,C,D,E,NA,NB>(this Entities.EntitiesWithout<NA,NB> ezs, LambdaRef<A,B,C,D,E> lambda)
+    {
+        var entityType = ezs.GetEntityTypeWithout<A,B,C,D,E>();
+        var entities = entityType.entities;
+        var a = entityType.poolA.items;
+        var b = entityType.poolB.items;
+        var c = entityType.poolС.items;
+        var d = entityType.poolD.items;
+        var e = entityType.poolE.items;
+        for (var index = 0; index < entityType.Count; index++)
+            lambda(ref a[entities[index]],
+                ref b[entities[index]],
+                ref c[entities[index]],
+                ref d[entities[index]],
+                ref e[entities[index]]);
+    }
     public static void EachWithJobs<A, NA>(this Entities.EntitiesWithout<NA> ezs, Lambda<A> lambda)
     {
         var entityType = ezs.GetEntityTypeWithout<A>();

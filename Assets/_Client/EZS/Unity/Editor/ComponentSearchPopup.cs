@@ -31,7 +31,7 @@ namespace Wargon.ezs.Unity
             buttonStyle.onHover.textColor = Color.black;
             buttonStyle.fontSize = 13;
             buttonStyle.hover.background = EntityGUI.NewTexture(2, 2, new Color(0f, 1f, 0.03f));
-            icon = EditorGUIUtility.Load("Assets/EZS/Unity/Images/EcsComponentIcon.png") as Texture2D;
+            icon = EditorGUIUtility.Load("Assets/_Client/EZS/Unity/Images/EcsComponentIcon.png") as Texture2D;
 
             labelStyle = GUI.skin.customStyles[468];
             labelStyle.fontStyle = FontStyle.Bold;
