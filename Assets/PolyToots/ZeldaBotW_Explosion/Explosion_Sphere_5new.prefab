@@ -9779,7 +9779,7 @@ GameObject:
   - component: {fileID: 6934877805146129835}
   - component: {fileID: 1997391395496140387}
   m_Layer: 12
-  m_Name: SphereBurst (1)
+  m_Name: SphereBurstWhite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
