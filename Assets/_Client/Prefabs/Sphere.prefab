@@ -92,7 +92,7 @@ SphereCollider:
   m_GameObject: {fileID: 2045206255293263786}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -118,6 +118,7 @@ MonoBehaviour:
   - id: 3
   - id: 4
   - id: 5
+  - id: 6
   runTime: 0
   destroyObject: 0
   destroyComponent: 0
@@ -156,3 +157,8 @@ MonoBehaviour:
       type: {class: Direction, ns: , asm: Assembly-CSharp}
       data:
         Value: {x: 0, y: 0, z: 0}
+    00000006:
+      type: {class: Impact, ns: , asm: Assembly-CSharp}
+      data:
+        Value: {fileID: 7622608392715819556, guid: 43b481d217e75d14395c5f14973f7432,
+          type: 3}

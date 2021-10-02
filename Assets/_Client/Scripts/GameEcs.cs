@@ -20,7 +20,7 @@ public class GameEcs : MonoBehaviour
                 .Add(new ProjectileMoveSystem())
                 .Add(new EnergyBallCollisionSystem())
                 
-                
+                .Add(new ExplosionCollisionSystem())
                 .Add(new LifeTimeSystem())
                 .Add(new PlayParticleOnSpawnSystem())
                 .Add(new ClearEventsSystem())
@@ -228,19 +228,19 @@ public class ProjectileMoveSystem : UpdateSystem
 
 public class EnergyBallCollisionSystem : UpdateSystem
 {
-    private RaycastHit[] hits = new RaycastHit[128];
     public override void Update()
     {
-        entities.Without<UnActive>().Each((EnergyBall EnergyBall, SphereCastRef sphereCast, TransformRef transform, Impact impact) =>
+        entities.Without<UnActive>().Each((EnergyBall EnergyBall, SphereCastRef sphereCast, TransformRef transform, Impact impact, Pooled pool) =>
         {
             sphereCast.Ray.origin = transform.Value.position;
-            //var hitsCount = Physics.SphereCastNonAlloc(sphereCastRef.Ray, sphereCastRef.Radius, hits, 50f);
-            if (Physics.SphereCast(sphereCast.Ray.origin, sphereCast.Radius, transform.Value.forward,
-                out sphereCast.Hit))
+
+            if (Physics.SphereCast(sphereCast.Ray.origin, sphereCast.Radius, transform.Value.forward, out sphereCast.Hit))
             {
                 var explosion = Pools.ReuseEntity(impact.Value, transform.Value.position, Quaternion.identity);
                 var multiply = EnergyBall.Power * 10f;
-                explosion.Get<TransformRef>().Value.localScale = new Vector3(multiply, multiply, multiply);
+                var explosionTransform = explosion.Get<TransformRef>();
+                explosionTransform.Value.localScale = new Vector3(multiply, multiply, multiply);
+                pool.SetActive(false);
             }
         });
     }
