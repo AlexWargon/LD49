@@ -12,15 +12,15 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - Player
+  - Enemy
   - Lighting
   - Ground
   - Postprocessing
-  - 
-  - 
-  - 
-  - 
+  - Rock
+  - Particle
+  - Projectile
+  - EnemyProjectile
   - 
   - 
   - 
