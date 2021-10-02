@@ -28,7 +28,9 @@ public class GameEcs : MonoBehaviour
                 .Add(new PlayParticleOnSpawnSystem())
                 .Add(new EnemyMoveSystem())
                 .Add(new ClearEventsSystem())
-            //.Add(new SyncTransformSystem())
+
+                .Add(new SyncTransformSystem())
+
             ;
 #if UNITY_EDITOR
         new DebugInfo(World);
@@ -339,6 +341,13 @@ public class ExplosionCollisionSystem : UpdateSystem
     }
 }
 
+[EcsComponent]
+public struct FlyWithBurst
+{
+    public float maxY;
+    public float maxX;
+    
+}
 public class PostExplosionCollisionEnemySystem : UpdateSystem
 {
     public override void Update()

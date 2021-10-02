@@ -179,7 +179,7 @@ public class SyncTransformSystem : UpdateSystem
     {
         base.Init(entities, world);
         transforms = new Transforms(world);
-        entities.Without<UnActive, SphereInWeapon>().EntityTypes.Add( typeof(Transforms), transforms);
+        entities.Without<UnActive, NoBurst>().EntityTypes.Add( typeof(Transforms), transforms);
     }
 
     public override void Update()
@@ -187,3 +187,4 @@ public class SyncTransformSystem : UpdateSystem
         transforms.Synchronize();
     }
 }
+[EcsComponent] public struct NoBurst{}
