@@ -109,4 +109,9 @@ public class RookRef
 {
     public Rigidbody RigidbodyRef;
 }
+[EcsComponent]
+public class Impact
+{
+    public MonoEntity Value;
+}
 

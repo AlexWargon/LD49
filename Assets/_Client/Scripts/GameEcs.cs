@@ -21,7 +21,7 @@ public class GameEcs : MonoBehaviour
                 .Add(new EnergyBallCollisionSystem())
                 
                 
-            
+                .Add(new LifeTimeSystem())
                 .Add(new PlayParticleOnSpawnSystem())
                 .Add(new ClearEventsSystem())
                 //.Add(new SyncTransformSystem())
@@ -215,7 +215,8 @@ public class ProjectileMoveSystem : UpdateSystem
         {
             transform.position += direction.Value * speed.Value * dt;
         });
-        entities.Without<UnActive>().Each((ref Direction direction,ref MoveSpeed speed, TransformRef transform) =>
+        
+        entities.Without<UnActive>().Each((ref Direction direction, ref MoveSpeed speed, TransformRef transform) =>
         {
             transform.Value.position += direction.Value * speed.Value * dt;
             Vector3 pos = transform.Value.position;
@@ -230,21 +231,44 @@ public class EnergyBallCollisionSystem : UpdateSystem
     private RaycastHit[] hits = new RaycastHit[128];
     public override void Update()
     {
-        entities.Without<UnActive>().Each((EnergyBall EnergyBall, SphereCastRef sphereCastRef, TransformRef transform) =>
+        entities.Without<UnActive>().Each((EnergyBall EnergyBall, SphereCastRef sphereCast, TransformRef transform, Impact impact) =>
         {
-            sphereCastRef.Ray.origin = transform.Value.position;
-            var hitsCount = Physics.SphereCastNonAlloc(sphereCastRef.Ray, sphereCastRef.Radius, hits, 50f);
-            if (Physics.SphereCast(sphereCastRef.Ray.origin, sphereCastRef.Radius, transform.Value.forward,
-                out sphereCastRef.Hit))
+            sphereCast.Ray.origin = transform.Value.position;
+            //var hitsCount = Physics.SphereCastNonAlloc(sphereCastRef.Ray, sphereCastRef.Radius, hits, 50f);
+            if (Physics.SphereCast(sphereCast.Ray.origin, sphereCast.Radius, transform.Value.forward,
+                out sphereCast.Hit))
             {
-                var entity = sphereCastRef.Hit.collider.GetComponent<MonoEntity>();
-                if(entity)
-                    Debug.Log($"{sphereCastRef.Hit.collider.name} Damaged");
+                var explosion = Pools.ReuseEntity(impact.Value, transform.Value.position, Quaternion.identity);
+                var multiply = EnergyBall.Power * 10f;
+                explosion.Get<TransformRef>().Value.localScale = new Vector3(multiply, multiply, multiply);
             }
-            // for (var i = 0; i < hitsCount; i++)
-            // {
-            //     
-            // }
+        });
+    }
+}
+
+public class LifeTimeSystem : UpdateSystem
+{
+    public override void Update()
+    {
+        var dt = Time.deltaTime;
+        entities.Without<UnActive>().Each((Pooled pool) =>
+        {
+            pool.CurrentLifeTime -= dt;
+            if(pool.CurrentLifeTime <= 0)
+                pool.SetActive(false);
+        });
+    }
+}
+public class ExplosionCollisionSystem : UpdateSystem
+{
+    public override void Update()
+    {
+        entities.Without<UnActive>().Each((TransformRef transform, SphereCastRef sphereCast, Particle particle, PooledEvent pooledEvent) =>
+        {
+            if (Physics.SphereCast(sphereCast.Ray.origin, sphereCast.Radius, transform.Value.forward, out sphereCast.Hit))
+            {
+                
+            }
         });
     }
 }
