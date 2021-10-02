@@ -20,9 +20,9 @@ public class GameEcs : MonoBehaviour
                 .Add(new ProjectileMoveSystem())
                 .Add(new EnergyBallCollisionSystem())
                 
+                
             
-            
-            
+                .Add(new PlayParticleOnSpawnSystem())
                 .Add(new SyncTransformSystem())
             ;
 #if UNITY_EDITOR
@@ -55,6 +55,21 @@ public class PlayerInpuntSystem : UpdateSystem
     }
 }
 
+[EcsComponent]
+public class Particle
+{
+    public ParticleSystem Value;
+}
+public class PlayParticleOnSpawnSystem : UpdateSystem
+{
+    public override void Update()
+    {
+        entities.Each((PooledEvent pooled, Particle particle) =>
+        {
+            particle.Value.Play();
+        });
+    }
+}
 public class PlayerMoveSystem : UpdateSystem
 {
     public override void Update()
@@ -91,22 +106,26 @@ public class PlayerAttackSystem : UpdateSystem
     {
         var dt = Time.deltaTime;
 
-        entities.Each((CastWeapon weapon, PlayerTag p, InputC input) =>
+        entities.Each((CastWeapon weapon, PlayerTag p, InputC input, TransformRef wpnTransform) =>
         {
             entities.Each((Player playerTag, ref RayCastRef playerCast) =>
             {
-                Debug.Log("SSS");
                 if (input.PressFire && weapon.Loaded)
                 {
                     weapon.PinchTime += dt;
-                    ref var sphereTransform = ref weapon.CurrentProjectile.GetRef<TransformComponent>();
+                    var sphereTransform = weapon.CurrentProjectile.Get<TransformRef>();
                     var energyBall = weapon.CurrentProjectile.Get<EnergyBall>();
-                    var moveDir = (weapon.SphereEndPos.position - weapon.SphereStartPos.position).normalized;
-    
-                    sphereTransform.position += moveDir * 2f * dt;
-                    sphereTransform.scale.x += dt;
-                    sphereTransform.scale.y += dt;
-                    sphereTransform.scale.z += dt;
+                    var moveDir = (weapon.SphereEndPos.localPosition - weapon.SphereStartPos.localPosition).normalized;
+                    var curPos = weapon.CurrentSpherePosition;
+
+                    curPos += moveDir * 2f * dt;
+                    weapon.CurrentSpherePosition = curPos;
+                    sphereTransform.Value.localPosition = curPos;
+                    var scale = sphereTransform.Value.localScale;
+                    scale.x += dt * 2f;
+                    scale.y += dt * 2f;
+                    scale.z += dt * 2f;
+                    sphereTransform.Value.localScale = scale;
                     energyBall.Power += dt;
                     energyBall.Size += dt;
                     return;
@@ -115,18 +134,33 @@ public class PlayerAttackSystem : UpdateSystem
                 if (!input.PressFire && weapon.PinchTime > 0f)
                 {
                     weapon.PinchTime = 0f;
-                    var dir = (playerCast.Hit.point - weapon.CurrentProjectile.GetRef<TransformComponent>().position).normalized;
+                    var dir = (playerCast.Hit.point - weapon.CurrentProjectile.Get<TransformRef>().Value.position).normalized;
                     weapon.CurrentProjectile.GetRef<Direction>().Value = dir;
                     weapon.CurrentProjectile.Remove<SphereInWeapon>();
-                    weapon.CurrentProjectile = Pools.ReuseEntity(weapon.Projectile, weapon.SphereStartPos.position, Quaternion.identity);
+                    var sphereTransform = weapon.CurrentProjectile.Get<TransformRef>();
+                    sphereTransform.Value.SetParent(Pools.GetContainer(weapon.CurrentProjectile.Get<Pooled>().containerIndex));
+
+                    var sphere = Pools.ReuseEntity(weapon.Projectile, weapon.SphereStartPos.position, Quaternion.identity);
+                    weapon.CurrentProjectile = sphere;
+                    sphereTransform = sphere.Get<TransformRef>();
+                    sphereTransform.Value.SetParent(wpnTransform.Value);
+                    sphereTransform.Value.localScale = Vector3.one;
+                    weapon.CurrentSpherePosition = weapon.SphereStartPos.localPosition;
+                    weapon.CurrentProjectile.Add(new SphereInWeapon());
                     weapon.Loaded = true;
                 }
 
                 if (!weapon.Loaded && weapon.PinchTime < 0.01f)
                 {
-                    
                     weapon.CurrentProjectile = Pools.ReuseEntity(weapon.Projectile, weapon.SphereStartPos.position, Quaternion.identity);
+                    weapon.CurrentSpherePosition = weapon.SphereStartPos.position;
+                    weapon.CurrentProjectile.Set<UnActive>();
                     weapon.Loaded = true;
+                }
+
+                if (weapon.Loaded)
+                {
+
                 }
             });
 
@@ -134,6 +168,20 @@ public class PlayerAttackSystem : UpdateSystem
     }
 }
 
+public class InWeaponSpherePosSetSystem : UpdateSystem
+{
+    public override void Update()
+    {
+        entities.Each((CastWeapon weapon) =>
+        {
+            entities.Each((SphereInWeapon inWeapon, ref TransformComponent transform) =>
+            {
+                
+            });
+        });
+
+    }
+}
 public class ProjectileMoveSystem : UpdateSystem
 {
     private const float RAY_DISTANCE = 0.5f;

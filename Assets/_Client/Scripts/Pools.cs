@@ -35,9 +35,18 @@ public class Pools : MonoBehaviour
             return instance;
         }
     }
-
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Transform GetContainerNonStatic(int id)
+    {
+        return poolContainers[id].transform;
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Transform GetContainer(int id)
+    {
+        return Instance.GetContainerNonStatic(id);
+    }  
     #region ENTITY POOL
-
+    
     private int poolIncreaseInFrame = 0;
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool CalledInFrameAlready()

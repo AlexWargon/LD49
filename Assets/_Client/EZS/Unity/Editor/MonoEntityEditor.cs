@@ -111,8 +111,8 @@ namespace Wargon.ezs.Unity {
             });
             EditorGUILayout.LabelField($"EZS", EditorStyles.whiteMiniLabel);
 
-            if (EditorGUI.EndChangeCheck())
-                EditorUtility.SetDirty(target);
+            EditorUtility.SetDirty(monoEntity);
+                
         }
 
         

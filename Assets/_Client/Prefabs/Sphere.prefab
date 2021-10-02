@@ -116,7 +116,6 @@ MonoBehaviour:
   - id: 1
   - id: 2
   - id: 3
-  - id: 4
   runTime: 0
   destroyObject: 0
   destroyComponent: 0
@@ -128,29 +127,22 @@ MonoBehaviour:
       data:
         Value: {fileID: 8157381814688211428}
     00000001:
-      type: {class: TransformComponent, ns: , asm: Assembly-CSharp}
-      data:
-        position: {x: 0, y: 0, z: 0}
-        scale: {x: 0, y: 0, z: 0}
-        rotation: {x: 0, y: 0, z: 0, w: 0}
-        right: {x: 0, y: 0, z: 0}
-    00000002:
       type: {class: EnergyBall, ns: , asm: Assembly-CSharp}
       data:
         Size: 0
         Power: 0
-    00000003:
+    00000002:
       type: {class: SphereCastRef, ns: , asm: Assembly-CSharp}
       data:
         Radius: 1
         Mask:
           serializedVersion: 2
           m_Bits: 0
-    00000004:
+    00000003:
       type: {class: Pooled, ns: , asm: Assembly-CSharp}
       data:
         containerIndex: 0
-        LifeTime: 25555
-        CurrentLifeTime: 25555
+        LifeTime: 25
+        CurrentLifeTime: 25
         mono: {fileID: 7227854556567925755}
         IsActive: 0

@@ -75,6 +75,7 @@ public struct Projectile
     public float PinchTime;
     public Transform SphereStartPos;
     public Transform SphereEndPos;
+    public Vector3 CurrentSpherePosition;
 }
 
 [EcsComponent]
