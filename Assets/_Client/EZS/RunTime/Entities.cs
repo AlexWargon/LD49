@@ -21,6 +21,7 @@
     public delegate void LambdaRef<A, B, C, D, E, F>(ref A a, ref B b, ref C c, ref D d, ref E e, ref F f);
     public delegate void LambdaRef<A, B, C, D, E, F, G>(ref A a, ref B b, ref C c, ref D d, ref E e, ref F f, ref G g);
 
+    public delegate void LambdaRRC<A, B, C>(ref A a, ref B b, C c);
     public delegate void LambdaRCCC<A, B, C, D>(ref A a, B b, C c, D d) where A : unmanaged;
 
     public delegate void LambdaCR<A, B>(A a, ref B b);

@@ -116,6 +116,8 @@ MonoBehaviour:
   - id: 1
   - id: 2
   - id: 3
+  - id: 4
+  - id: 5
   runTime: 0
   destroyObject: 0
   destroyComponent: 0
@@ -142,7 +144,15 @@ MonoBehaviour:
       type: {class: Pooled, ns: , asm: Assembly-CSharp}
       data:
         containerIndex: 0
-        LifeTime: 25
-        CurrentLifeTime: 25
+        LifeTime: 12
+        CurrentLifeTime: 12
         mono: {fileID: 7227854556567925755}
         IsActive: 0
+    00000004:
+      type: {class: MoveSpeed, ns: , asm: Assembly-CSharp}
+      data:
+        Value: 3
+    00000005:
+      type: {class: Direction, ns: , asm: Assembly-CSharp}
+      data:
+        Value: {x: 0, y: 0, z: 0}

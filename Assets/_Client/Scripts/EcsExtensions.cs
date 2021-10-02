@@ -74,6 +74,19 @@ public static class EcsExtensions
         for (var index = 0; index < entityType.Count; index++)
             lambda(ref a[entities[index]]);
     }
+
+    public static void Each<A,B,C,NA>(this Entities.EntitiesWithout<NA> ezs, LambdaRRC<A,B,C> lambda)
+    {
+        var entityType = ezs.GetEntityTypeWithout<A,B,C>();
+        var entities = entityType.entities;
+        var a = entityType.poolA.items;
+        var b = entityType.poolB.items;
+        var c = entityType.poolС.items;
+        for (var index = 0; index < entityType.Count; index++)
+            lambda(ref a[entities[index]],
+                ref b[entities[index]],
+                c[entities[index]]);
+    }
     public static void Each<A,B,NA>(this Entities.EntitiesWithout<NA> ezs, LambdaRef<A,B> lambda)
     {
         var entityType = ezs.GetEntityTypeWithout<A,B>();

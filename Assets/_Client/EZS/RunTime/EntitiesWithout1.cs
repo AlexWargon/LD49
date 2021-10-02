@@ -118,6 +118,32 @@ namespace Wargon.ezs
                 }
             }
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void Each<A,B,C>(LambdaRRC<A,B,C> lambda)
+            {
+                var entityType = GetEntityTypeWithout<A, B, C>();
+                var entities = entityType.entities;
+                var a = entityType.poolA.items;
+                var b = entityType.poolB.items;
+                var c = entityType.poolС.items;
+                for (var index = 0; index < entityType.Count; index++)
+                    lambda(ref a[entities[index]],
+                        ref b[entities[index]],
+                        c[entities[index]]);
+            }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void Each<A,B,C>(LambdaRef<A,B,C> lambda)
+            {
+                var entityType = GetEntityTypeWithout<A,B,C>();
+                var entities = entityType.entities;
+                var a = entityType.poolA.items;
+                var b = entityType.poolB.items;
+                var c = entityType.poolС.items;
+                for (var index = 0; index < entityType.Count; index++)
+                    lambda(ref a[entities[index]],
+                        ref b[entities[index]],
+                        ref c[entities[index]]);
+            }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Each<A, B, C, D, E>(LambdaCCCCRR<Entity,A, B, C, D, E> action)
             {
                 var entityType = GetEntityTypeWithout<A, B, C, D, E>();
