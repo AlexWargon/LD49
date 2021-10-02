@@ -128,7 +128,7 @@ public class PlayerAttackSystem : UpdateSystem
                     var moveDir = (weapon.SphereEndPos.localPosition - weapon.SphereStartPos.localPosition).normalized;
                     var curPos = weapon.CurrentSpherePosition;
                     
-                    curPos += moveDir * 2f * dt;
+                    curPos += moveDir * 1f * dt;
                     weapon.CurrentSpherePosition = curPos;
                     sphereTransform.Value.localPosition = curPos;
                     var scale = sphereTransform.Value.localScale;
@@ -136,8 +136,8 @@ public class PlayerAttackSystem : UpdateSystem
                     scale.y += dt * 2f;
                     scale.z += dt * 2f;
                     sphereTransform.Value.localScale = scale;
-                    energyBall.Power += dt;
-                    energyBall.Size += dt;
+                    energyBall.Power += dt * 2f;
+                    energyBall.Size += dt * 2f;
                     return;
                 }
                 //SHOOT
@@ -145,14 +145,12 @@ public class PlayerAttackSystem : UpdateSystem
                 {
                     
                     weapon.PinchTime = 0f;
-                    var dir = (playerCast.Hit.point - weapon.CurrentProjectile.Get<TransformRef>().Value.position).normalized;
-                    var sphere = weapon.CurrentProjectile;
-                    sphere.GetRef<Direction>().Value = dir;
 
+                    var sphere = weapon.CurrentProjectile;
                     var sphereTransform = sphere.Get<TransformRef>();
                     sphereTransform.Value.SetParent(Pools.GetContainer(sphere.Get<Pooled>().containerIndex));
                     ref var sphereDir = ref sphere.GetRef<Direction>();
-                    sphereDir.Value = dir;
+                    sphereDir.Value = playerCast.Ray.direction;
                     sphere.Remove<UnActive>();
                     sphere.Remove<SphereInWeapon>();
                     
@@ -166,6 +164,8 @@ public class PlayerAttackSystem : UpdateSystem
                     weapon.CurrentSpherePosition = weapon.SphereStartPos.localPosition;
                     weapon.CurrentProjectile.Add(new SphereInWeapon());
                     weapon.CurrentProjectile.Set<UnActive>();
+                    newShere.Get<EnergyBall>().Power = 1;
+                    newShere.Get<EnergyBall>().Size = 1;
                     weapon.Loaded = true;
                 }
 
@@ -179,13 +179,11 @@ public class PlayerAttackSystem : UpdateSystem
                     weapon.CurrentSpherePosition = weapon.SphereStartPos.localPosition;
                     weapon.CurrentProjectile.Add(new SphereInWeapon());
                     weapon.CurrentProjectile.Set<UnActive>();
+                    newShere.Get<EnergyBall>().Power = 1;
+                    newShere.Get<EnergyBall>().Size = 1;
                     weapon.Loaded = true;
                 }
 
-                if (weapon.Loaded)
-                {
-
-                }
             });
 
         });
@@ -233,11 +231,17 @@ public class EnergyBallCollisionSystem : UpdateSystem
         {
             sphereCastRef.Ray.origin = transform.Value.position;
             var hitsCount = Physics.SphereCastNonAlloc(sphereCastRef.Ray, sphereCastRef.Radius, hits, 50f);
-            for (var i = 0; i < hitsCount; i++)
+            if (Physics.SphereCast(sphereCastRef.Ray.origin, sphereCastRef.Radius, transform.Value.forward,
+                out sphereCastRef.Hit))
             {
-                if(hits[i].collider != null)
+                var entity = sphereCastRef.Hit.collider.GetComponent<MonoEntity>();
+                if(entity)
                     Debug.Log($"{sphereCastRef.Hit.collider.name} Damaged");
             }
+            // for (var i = 0; i < hitsCount; i++)
+            // {
+            //     
+            // }
         });
     }
 }
