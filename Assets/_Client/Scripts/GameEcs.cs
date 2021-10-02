@@ -213,29 +213,31 @@ public class ProjectileMoveSystem : UpdateSystem
     public override void Update()
     {
         var dt = Time.deltaTime;
-        // entities.Without<UnActive>().Each((ref MoveSpeed speed, ref TransformComponent transform, ref Direction direction) =>
-        // {
-        //     transform.position += direction.Value * speed.Value * dt;
-        // });
-        // entities.Without<UnActive>().Each((ref Direction direction,ref MoveSpeed speed,TransformRef transform) =>
-        // {
-        //     transform.Value.position += direction.Value * speed.Value * dt;
-        // });
+        entities.Without<UnActive>().Each((ref MoveSpeed speed, ref TransformComponent transform, ref Direction direction) =>
+        {
+            transform.position += direction.Value * speed.Value * dt;
+        });
+        entities.Without<UnActive>().Each((ref Direction direction,ref MoveSpeed speed, TransformRef transform) =>
+        {
+            transform.Value.position += direction.Value * speed.Value * dt;
+        });
     }
 }
 
 public class EnergyBallCollisionSystem : UpdateSystem
 {
+    private RaycastHit[] hits = new RaycastHit[128];
     public override void Update()
     {
-        // entities.Without<UnActive>().Each((EnergyBall EnergyBall, SphereCastRef sphereCastRef, ref TransformComponent transform) =>
-        // {
-        //     sphereCastRef.Ray.origin = transform.position;
-        //     if (Physics.SphereCast(sphereCastRef.Ray, sphereCastRef.Radius, out sphereCastRef.Hit))
-        //     {
-        //         if(sphereCastRef.Hit.collider != null)
-        //             Debug.Log($"{sphereCastRef.Hit.collider.name} Damaged");
-        //     }
-        // });
+        entities.Without<UnActive>().Each((EnergyBall EnergyBall, SphereCastRef sphereCastRef, TransformRef transform) =>
+        {
+            sphereCastRef.Ray.origin = transform.Value.position;
+            var hitsCount = Physics.SphereCastNonAlloc(sphereCastRef.Ray, sphereCastRef.Radius, hits, 50f);
+            for (var i = 0; i < hitsCount; i++)
+            {
+                if(hits[i].collider != null)
+                    Debug.Log($"{sphereCastRef.Hit.collider.name} Damaged");
+            }
+        });
     }
 }

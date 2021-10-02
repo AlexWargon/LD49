@@ -90,7 +90,7 @@ namespace Wargon.ezs
                 Array.Resize(ref items, id + 256);
                 length = items.Length;
             }
-            items[id] = UnsafeUtility.As<object, T>(ref component);
+            items[id] = (T)component;
         }
 
         public event Action<Entity> OnRemove;
