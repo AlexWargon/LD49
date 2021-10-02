@@ -22,9 +22,10 @@ public class SyncTransformSystem : UpdateSystem
                 ComponentType<TransformComponent>.ID,
                 ComponentType<TransformRef>.ID
             };
-            ExludeCount = 1;
+            ExludeCount = 2;
             ExcludeTypes = new[] {
                 ComponentType<UnActive>.ID,
+                ComponentType<NoBurst>.ID
             };
             structComponents = world.GetPool<TransformComponent>();
             classComponents = world.GetPool<TransformRef>();
@@ -37,6 +38,9 @@ public class SyncTransformSystem : UpdateSystem
             var PoolEx = world.GetPool<UnActive>();
             PoolEx.OnAdd += OnAddExclude;
             PoolEx.OnRemove += OnRemoveExclude;
+            var PoolEx2 = world.GetPool<NoBurst>();
+            PoolEx2.OnAdd += OnAddExclude;
+            PoolEx2.OnRemove += OnRemoveExclude;
             world.OnCreateEntityType(this);
         }
 
@@ -181,7 +185,7 @@ public class SyncTransformSystem : UpdateSystem
     {
         base.Init(entities, world);
         transforms = new Transforms(world);
-        entities.Without<UnActive, NoBurst>().EntityTypes.Add( typeof(Transforms), transforms);
+        entities.Without<UnActive,NoBurst>().EntityTypes.Add( typeof(Transforms), transforms);
     }
 
     public override void Update()
