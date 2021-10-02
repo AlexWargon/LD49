@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.051218837, g: 0.07234969, b: 0.097634524, a: 1}
+  m_IndirectSpecularColor: {r: 0.053388067, g: 0.08097158, b: 0.1232616, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -326,13 +326,14 @@ GameObject:
   m_Component:
   - component: {fileID: 1005013948}
   - component: {fileID: 1005013947}
+  - component: {fileID: 1005013949}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!108 &1005013947
 Light:
   m_ObjectHideFlags: 0
@@ -355,8 +356,8 @@ Light:
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
+    m_Bias: 1
+    m_NormalBias: 1
     m_NearPlane: 0.2
     m_CullingMatrixOverride:
       e00: 1
@@ -409,6 +410,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &1005013949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1005013946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_UsePipelineSettings: 1
 --- !u!1 &1008027902
 GameObject:
   m_ObjectHideFlags: 0
@@ -832,16 +846,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2815682649097251227, guid: 3ac1faa0bc7e6fb4ca0838af0c249c4a,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2815682649968636735, guid: 3ac1faa0bc7e6fb4ca0838af0c249c4a,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2815682649986914988, guid: 3ac1faa0bc7e6fb4ca0838af0c249c4a,
         type: 3}
       propertyPath: m_RootOrder
@@ -901,46 +905,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Explosion_Sphere_SG
-      objectReference: {fileID: 0}
-    - target: {fileID: 2815682650009872422, guid: 3ac1faa0bc7e6fb4ca0838af0c249c4a,
-        type: 3}
-      propertyPath: startDelay.scalar
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2815682650041767348, guid: 3ac1faa0bc7e6fb4ca0838af0c249c4a,
-        type: 3}
-      propertyPath: startDelay.scalar
-      value: 0.9
-      objectReference: {fileID: 0}
-    - target: {fileID: 2815682650041767351, guid: 3ac1faa0bc7e6fb4ca0838af0c249c4a,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2815682650194627381, guid: 3ac1faa0bc7e6fb4ca0838af0c249c4a,
-        type: 3}
-      propertyPath: startDelay.scalar
-      value: 0.3
-      objectReference: {fileID: 0}
-    - target: {fileID: 2815682650194627381, guid: 3ac1faa0bc7e6fb4ca0838af0c249c4a,
-        type: 3}
-      propertyPath: InitialModule.startSize.scalar
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 2815682650194627381, guid: 3ac1faa0bc7e6fb4ca0838af0c249c4a,
-        type: 3}
-      propertyPath: InitialModule.startLifetime.scalar
-      value: 0.8
-      objectReference: {fileID: 0}
-    - target: {fileID: 2815682650333921058, guid: 3ac1faa0bc7e6fb4ca0838af0c249c4a,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2815682650333921063, guid: 3ac1faa0bc7e6fb4ca0838af0c249c4a,
-        type: 3}
-      propertyPath: startDelay.scalar
-      value: 0.1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3ac1faa0bc7e6fb4ca0838af0c249c4a, type: 3}
