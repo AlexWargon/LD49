@@ -21,6 +21,8 @@ public class GameEcs : MonoBehaviour
                 .Add(new EnergyBallCollisionSystem())
                 
                 .Add(new ExplosionCollisionSystem())
+                .Add(new PostExplosionCollisionEnemySystem())
+                .Add(new PostExplosionCollisionRocksSystem())
                 .Add(new LifeTimeSystem())
                 .Add(new PlayParticleOnSpawnSystem())
                 .Add(new ClearEventsSystem())
@@ -46,7 +48,9 @@ public class ClearEventsSystem : UpdateSystem
 {
     public override void Update()
     {
-        entities.Each((Entity Entity, PooledEvent pooledEvent)=> Entity.Remove<PooledEvent>());
+        entities.Each((Entity e, PooledEvent evnt)=> e.Remove<PooledEvent>());
+        entities.Each((Entity e, Collided evnt)=> e.Remove<Collided>());
+        entities.Each((Entity e, DamagedByExplosion evnt)=> e.Remove<DamagedByExplosion>());
     }
 }
 public class PlayerInpuntSystem : UpdateSystem
@@ -75,6 +79,11 @@ public class PlayParticleOnSpawnSystem : UpdateSystem
         entities.Each((PooledEvent pooled, Particle particle) =>
         {
             particle.Value.Play();
+        });
+        entities.Each((PooledEvent pooled, ExplosionTriggerRef particle) =>
+        {
+            particle.Value.triggered = false;
+            particle.Value.delayStarted = false;
         });
     }
 }
@@ -225,23 +234,33 @@ public class ProjectileMoveSystem : UpdateSystem
         });
     }
 }
-
+[EcsComponent] public class Collided{}
 public class EnergyBallCollisionSystem : UpdateSystem
 {
     public override void Update()
     {
-        entities.Without<UnActive>().Each((EnergyBall EnergyBall, SphereCastRef sphereCast, TransformRef transform, Impact impact, Pooled pool) =>
+        // entities.Without<UnActive>().Each((EnergyBall EnergyBall, SphereCastRef sphereCast, TransformRef transform, Impact impact, Pooled pool) =>
+        // {
+        //     sphereCast.Ray.origin = transform.Value.position;
+        //
+        //     if (Physics.SphereCast(sphereCast.Ray.origin, sphereCast.Radius, Vector3.zero, out sphereCast.Hit))
+        //     {
+        //         var explosion = Pools.ReuseEntity(impact.Value, transform.Value.position, Quaternion.identity);
+        //         var multiply = EnergyBall.Power * 10f;
+        //         var explosionTransform = explosion.Get<TransformRef>();
+        //         explosionTransform.Value.localScale = new Vector3(multiply, multiply, multiply);
+        //         pool.SetActive(false);
+        //     }
+        // });
+        entities.Without<UnActive>().Each((EnergyBall EnergyBall, Collided Collided, TransformRef transform, Impact impact, Pooled pool) =>
         {
-            sphereCast.Ray.origin = transform.Value.position;
-
-            if (Physics.SphereCast(sphereCast.Ray.origin, sphereCast.Radius, transform.Value.forward, out sphereCast.Hit))
-            {
-                var explosion = Pools.ReuseEntity(impact.Value, transform.Value.position, Quaternion.identity);
-                var multiply = EnergyBall.Power * 10f;
-                var explosionTransform = explosion.Get<TransformRef>();
-                explosionTransform.Value.localScale = new Vector3(multiply, multiply, multiply);
-                pool.SetActive(false);
-            }
+            var explosion = Pools.ReuseEntity(impact.Value, transform.Value.position, Quaternion.identity);
+            var multiply = EnergyBall.Power * 10f;
+            explosion.Get<ExplosionPower>().Value = multiply;
+            explosion.Get<SphereCastRef>().Radius = multiply;
+            var explosionTransform = explosion.Get<TransformRef>();
+            explosionTransform.Value.localScale = new Vector3(multiply, multiply, multiply);
+            pool.SetActive(false);
         });
     }
 }
@@ -259,16 +278,103 @@ public class LifeTimeSystem : UpdateSystem
         });
     }
 }
+
+[EcsComponent]
+public class DamagedByExplosion
+{
+    public float Power;
+    public Vector3 From;
+}
+
+[EcsComponent]
+public class CanTakeDamageByExplosion
+{
+}
+[EcsComponent]
+public class ExplosionPower
+{
+    public float Value;
+}
 public class ExplosionCollisionSystem : UpdateSystem
+{
+    private Collider[] colliders = new Collider[64];
+    public override void Update()
+    {
+        entities.Without<UnActive>().Each((TransformRef transform, SphereCastRef sphereCast, PooledEvent pooledEvent, ExplosionPower power) =>
+        {
+            var collidersCount = Physics.OverlapSphereNonAlloc(transform.Value.position, sphereCast.Radius, colliders);
+
+            for (var i = 0; i < collidersCount; i++)
+            {
+                Debug.Log(colliders[i].name);
+                var mono = colliders[i].GetComponent<MonoEntity>();
+                if (!mono) return;
+            
+                if (mono.Entity.Has<CanTakeDamageByExplosion>())
+                {
+                    Debug.Log("SSS");
+                    mono.Entity.Add(new DamagedByExplosion
+                    {
+                        Power = power.Value,
+                        From = transform.Value.position
+                    });
+                }
+            }
+            // if (!Physics.SphereCast(sphereCast.Ray.origin, sphereCast.Radius, transform.Value.forward, out sphereCast.Hit)) return;
+            // Debug.Log("123123");
+            // var mono = sphereCast.Hit.collider.GetComponent<MonoEntity>();
+            // if (!mono) return;
+            //
+            // if (mono.Entity.Has<CanTakeDamageByExplosion>())
+            // {
+            //     Debug.Log("SSS");
+            //     mono.Entity.Add(new DamagedByExplosion
+            //     {
+            //         Power = power.Value,
+            //         From = transform.Value.position
+            //     });
+            // }
+        });
+    }
+}
+
+public class PostExplosionCollisionEnemySystem : UpdateSystem
 {
     public override void Update()
     {
-        entities.Without<UnActive>().Each((TransformRef transform, SphereCastRef sphereCast, Particle particle, PooledEvent pooledEvent) =>
+        entities.Without<RookRef>().Each((Entity entity, DamagedByExplosion damaged, RigidBody rb, CanTakeDamageByExplosion tag, Enemy enemy) =>
         {
-            if (Physics.SphereCast(sphereCast.Ray.origin, sphereCast.Radius, transform.Value.forward, out sphereCast.Hit))
+            var force = (rb.Value.position - damaged.From).normalized * damaged.Power; 
+            rb.Value.AddForce(force, ForceMode.Impulse);
+        });
+    }
+}
+
+public class PostExplosionCollisionRocksSystem : UpdateSystem
+{
+    public override void Update()
+    {
+        entities.Each((Entity entity,DamagedByExplosion damaged, RigidBody rigidBody, RookRef rookRef, CanTakeDamageByExplosion tag) =>
+        {
+            rigidBody.Value.isKinematic = false;
+            var force1 = (rigidBody.Value.position - damaged.From).normalized * damaged.Power * 5; 
+            entity.Get<RigidBody>().Value.AddForce(force1, ForceMode.Impulse);
+            
+            
+            for (var i = rookRef.Other.Value.Count - 1; i >= 0; i--)
             {
-                
+                var rock = rookRef.Other.Value[i].Entity;
+                if(rock.id == entity.id) continue;
+                if (rock.Has<CanTakeDamageByExplosion>())
+                {
+                    var rb = rock.Get<RigidBody>().Value;
+                    rb.isKinematic = false;
+                    var force = (rb.position - damaged.From).normalized * damaged.Power * 5; 
+                    rock.Get<RigidBody>().Value.AddForce(force, ForceMode.Impulse);
+                    rock.Remove<CanTakeDamageByExplosion>();
+                }
             }
+            entity.Remove<CanTakeDamageByExplosion>();
         });
     }
 }

@@ -107,7 +107,7 @@ public class SphereInWeapon{}
 [EcsComponent]
 public class RookRef
 {
-    public Rigidbody RigidbodyRef;
+    public MonoEntityList Other;
 }
 [EcsComponent]
 public class Impact
@@ -115,3 +115,8 @@ public class Impact
     public MonoEntity Value;
 }
 
+[EcsComponent]
+public class Enemy
+{
+    
+}

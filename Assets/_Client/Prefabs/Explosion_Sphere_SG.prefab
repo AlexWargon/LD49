@@ -29538,6 +29538,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1825566870512524817}
   - component: {fileID: 7622608392715819556}
+  - component: {fileID: 8873174208589331181}
+  - component: {fileID: 9146327162202285864}
   m_Layer: 0
   m_Name: Explosion_Sphere_SG
   m_TagString: Untagged
@@ -29580,6 +29582,8 @@ MonoBehaviour:
   - id: 1
   - id: 2
   - id: 3
+  - id: 4
+  - id: 5
   runTime: 0
   destroyObject: 0
   destroyComponent: 0
@@ -29609,6 +29613,41 @@ MonoBehaviour:
       type: {class: TransformRef, ns: , asm: Assembly-CSharp}
       data:
         Value: {fileID: 1825566870512524817}
+    00000004:
+      type: {class: ExplosionTriggerRef, ns: , asm: Assembly-CSharp}
+      data:
+        Value: {fileID: 8873174208589331181}
+    00000005:
+      type: {class: SphereColliderRef, ns: , asm: Assembly-CSharp}
+      data:
+        Value: {fileID: 9146327162202285864}
+--- !u!114 &8873174208589331181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1825566870512524816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6e6d6986a427bf49be39fdbe4f96b90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  delayStarted: 0
+  triggered: 0
+--- !u!135 &9146327162202285864
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1825566870512524816}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &6916748220815604347
 GameObject:
   m_ObjectHideFlags: 0
