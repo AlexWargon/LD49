@@ -344,10 +344,47 @@ public class ExplosionCollisionSystem : UpdateSystem
 [EcsComponent]
 public struct FlyWithBurst
 {
-    public float maxY;
-    public float maxX;
-    
+    public Vector3 Direction;
+    public float Delay;
+    public float Force;
+    public bool Grounded;
 }
+
+public class BurstFlyEnemySystem : UpdateSystem
+{
+    private FlyEnemyJob j0b;
+    public override void Update()
+    {
+        j0b.dt = Time.deltaTime;
+        entities.EachWithJob<FlyEnemyJob, FlyWithBurst, TransformComponent>(ref j0b);
+    }
+    public struct FlyEnemyJob : IJobExecute<FlyWithBurst, TransformComponent>
+    {
+        public float dt;
+        public void ForEach(ref FlyWithBurst fly, ref TransformComponent transform)
+        {
+            if (!fly.Grounded)
+            {
+                transform.position += fly.Direction * fly.Force * dt;
+                fly.Delay += dt;
+            }
+
+            if (fly.Delay > 1)
+            {
+                if (transform.position.y < 0.1f)
+                    fly.Grounded = true;
+            }
+            
+            
+        }
+    }
+}
+[EcsComponent]
+public class CurveLine
+{
+    public AnimationCurve Value;
+}
+
 public class PostExplosionCollisionEnemySystem : UpdateSystem
 {
     public override void Update()
@@ -394,8 +431,8 @@ public class EnemyMoveSystem : UpdateSystem
     public override void Update()
     {
         entities.Without<UnActive>().Each((EnemyRef enemyRef) =>
-            {
-                enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
-            });
+        {
+            enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
+        });
     }
 }
