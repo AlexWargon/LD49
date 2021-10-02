@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1825566868442271626}
   - component: {fileID: 1825566868442271624}
   - component: {fileID: 1825566868442271627}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Distort
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4894,7 +4894,7 @@ GameObject:
   - component: {fileID: 1825566868577958812}
   - component: {fileID: 1825566868577958810}
   - component: {fileID: 1825566868577958813}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: SphereBurst
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9777,7 +9777,7 @@ GameObject:
   - component: {fileID: 1825566868637411842}
   - component: {fileID: 1825566868637411840}
   - component: {fileID: 1825566868637411843}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: SparksFast
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14675,7 +14675,7 @@ GameObject:
   - component: {fileID: 1825566869554310439}
   - component: {fileID: 1825566869554310437}
   - component: {fileID: 1825566869554310436}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: ParticleLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19549,7 +19549,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1825566870295672707}
   - component: {fileID: 1825566870295672704}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Point Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19643,7 +19643,7 @@ GameObject:
   - component: {fileID: 1825566870472502429}
   - component: {fileID: 1825566870472502427}
   - component: {fileID: 1825566870472502426}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Embers
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24535,7 +24535,7 @@ GameObject:
   - component: {fileID: 1825566870499348747}
   - component: {fileID: 1825566870499348745}
   - component: {fileID: 1825566870499348744}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: BotWSmoke
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29540,7 +29540,7 @@ GameObject:
   - component: {fileID: 7622608392715819556}
   - component: {fileID: 8873174208589331181}
   - component: {fileID: 9146327162202285864}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Explosion_Sphere_SG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29659,7 +29659,7 @@ GameObject:
   - component: {fileID: 3839916079160158317}
   - component: {fileID: 4957570110993883519}
   - component: {fileID: 4096211516288435421}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Rays
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34552,7 +34552,7 @@ GameObject:
   - component: {fileID: 7663699015494273485}
   - component: {fileID: 603063761261215787}
   - component: {fileID: 2337391521131690116}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: BigDotFlash
   m_TagString: Untagged
   m_Icon: {fileID: 0}

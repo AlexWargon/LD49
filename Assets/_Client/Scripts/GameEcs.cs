@@ -20,7 +20,7 @@ public class GameEcs : MonoBehaviour
                 .Add(new ProjectileMoveSystem())
                 .Add(new EnergyBallCollisionSystem())
                 
-                .Add(new ExplosionCollisionSystem())
+                //.Add(new ExplosionCollisionSystem())
                 .Add(new PostExplosionCollisionEnemySystem())
                 .Add(new PostExplosionCollisionRocksSystem())
                 .Add(new LifeTimeSystem())
@@ -312,7 +312,6 @@ public class ExplosionCollisionSystem : UpdateSystem
             
                 if (mono.Entity.Has<CanTakeDamageByExplosion>())
                 {
-                    Debug.Log("SSS");
                     mono.Entity.Add(new DamagedByExplosion
                     {
                         Power = power.Value,
