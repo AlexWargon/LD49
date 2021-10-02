@@ -4977,7 +4977,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2815682649986914988}
-  - component: {fileID: 9083549911523354623}
+  - component: {fileID: 6309005299245211289}
   m_Layer: 0
   m_Name: Explosion_Sphere_5g
   m_TagString: Untagged
@@ -5000,7 +5000,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &9083549911523354623
+--- !u!114 &6309005299245211289
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5024,9 +5024,9 @@ MonoBehaviour:
   references:
     version: 1
     00000000:
-      type: {class: ParticleExplosion, ns: , asm: Assembly-CSharp}
+      type: {class: Particle, ns: , asm: Assembly-CSharp}
       data:
-        _ParticleSystem: {fileID: 2815682650259812029}
+        Value: {fileID: 2815682650259812029}
 --- !u!1 &2815682650009872417
 GameObject:
   m_ObjectHideFlags: 0

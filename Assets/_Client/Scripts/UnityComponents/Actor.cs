@@ -87,6 +87,7 @@ public class Actor : MonoBehaviour
 
     private void Update()
     {
+
         Cursor.lockState = CursorLockMode.None;
         // If the run button is set to toggle, then switch between walk/run speed. (We use Update for this...
         // FixedUpdate is a poor place to use GetButtonDown, since it doesn't necessarily run every frame and can miss the event)

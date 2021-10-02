@@ -103,9 +103,3 @@ public class SphereCastRef
 }
 [EcsComponent]
 public class SphereInWeapon{}
-
-[EcsComponent]
-public class ParticleExplosion
-{
-    public ParticleSystem _ParticleSystem;
-}
