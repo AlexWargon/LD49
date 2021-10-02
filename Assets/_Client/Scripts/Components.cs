@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using Wargon.ezs;
 using Wargon.ezs.Unity;
 
@@ -116,7 +117,8 @@ public class Impact
 }
 
 [EcsComponent]
-public class Enemy
+public class EnemyRef
 {
-    
+    public Transform MoveToTargetValue;
+    public NavMeshAgent NavMeshAgentVelue;
 }

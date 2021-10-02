@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using Wargon.ezs;
 using Wargon.ezs.Unity;
 
@@ -341,7 +342,7 @@ public class PostExplosionCollisionEnemySystem : UpdateSystem
 {
     public override void Update()
     {
-        entities.Without<RookRef>().Each((Entity entity, DamagedByExplosion damaged, RigidBody rb, CanTakeDamageByExplosion tag, Enemy enemy) =>
+        entities.Without<RookRef>().Each((Entity entity, DamagedByExplosion damaged, RigidBody rb, CanTakeDamageByExplosion tag, EnemyRef enemy) =>
         {
             var force = (rb.Value.position - damaged.From).normalized * damaged.Power; 
             rb.Value.AddForce(force, ForceMode.Impulse);
@@ -375,5 +376,16 @@ public class PostExplosionCollisionRocksSystem : UpdateSystem
             }
             entity.Remove<CanTakeDamageByExplosion>();
         });
+    }
+}
+
+public class EnemyMoveSystem : UpdateSystem
+{
+    public override void Update()
+    {
+        entities.Without<UnActive>().Each((EnemyRef enemyRef) =>
+            {
+                enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
+            });
     }
 }
