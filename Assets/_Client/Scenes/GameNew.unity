@@ -523,31 +523,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3856945881195804611, guid: a0306a0ab5cc64f468d766f0c60bf580,
-        type: 3}
-      propertyPath: m_ClearFlags
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3856945881195804611, guid: a0306a0ab5cc64f468d766f0c60bf580,
-        type: 3}
-      propertyPath: m_BackGroundColor.b
-      value: 0.23529413
-      objectReference: {fileID: 0}
-    - target: {fileID: 3856945881195804611, guid: a0306a0ab5cc64f468d766f0c60bf580,
-        type: 3}
-      propertyPath: m_BackGroundColor.g
-      value: 0.23529413
-      objectReference: {fileID: 0}
-    - target: {fileID: 3856945881195804611, guid: a0306a0ab5cc64f468d766f0c60bf580,
-        type: 3}
-      propertyPath: m_BackGroundColor.r
-      value: 0.23529413
-      objectReference: {fileID: 0}
-    - target: {fileID: 3856945881195804611, guid: a0306a0ab5cc64f468d766f0c60bf580,
-        type: 3}
-      propertyPath: m_CullingMask.m_Bits
-      value: 55
-      objectReference: {fileID: 0}
     - target: {fileID: 3856945881406288969, guid: a0306a0ab5cc64f468d766f0c60bf580,
         type: 3}
       propertyPath: m_RootOrder
@@ -610,44 +585,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a0306a0ab5cc64f468d766f0c60bf580, type: 3}
---- !u!1 &1884755935 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3856945881195804615, guid: a0306a0ab5cc64f468d766f0c60bf580,
-    type: 3}
-  m_PrefabInstance: {fileID: 1464014504}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1884755937
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1884755935}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_RenderShadows: 1
-  m_RequiresDepthTextureOption: 2
-  m_RequiresOpaqueTextureOption: 2
-  m_CameraType: 0
-  m_Cameras: []
-  m_RendererIndex: -1
-  m_VolumeLayerMask:
-    serializedVersion: 2
-    m_Bits: 1
-  m_VolumeTrigger: {fileID: 0}
-  m_RenderPostProcessing: 1
-  m_Antialiasing: 1
-  m_AntialiasingQuality: 2
-  m_StopNaN: 0
-  m_Dithering: 0
-  m_ClearDepth: 1
-  m_AllowXRRendering: 1
-  m_RequiresDepthTexture: 0
-  m_RequiresColorTexture: 0
-  m_Version: 2
 --- !u!1 &1962610026
 GameObject:
   m_ObjectHideFlags: 0
@@ -739,7 +676,7 @@ Transform:
   m_GameObject: {fileID: 1962610026}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 50, y: 1, z: 50}
+  m_LocalScale: {x: 50, y: 0.1, z: 50}
   m_Children: []
   m_Father: {fileID: 736595995}
   m_RootOrder: 1
