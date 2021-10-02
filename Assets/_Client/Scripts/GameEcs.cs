@@ -26,8 +26,9 @@ public class GameEcs : MonoBehaviour
                 .Add(new PostExplosionCollisionRocksSystem())
                 .Add(new LifeTimeSystem())
                 .Add(new PlayParticleOnSpawnSystem())
+                .Add(new EnemyMoveSystem())
                 .Add(new ClearEventsSystem())
-                //.Add(new SyncTransformSystem())
+            //.Add(new SyncTransformSystem())
             ;
 #if UNITY_EDITOR
         new DebugInfo(World);
