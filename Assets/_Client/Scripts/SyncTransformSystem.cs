@@ -14,6 +14,7 @@ public class SyncTransformSystem : UpdateSystem
         private readonly Pool<TransformRef> classComponents;
         private TransformAccessArray transformAccessArray;
         private bool disposed;
+        private TransformSynchronizeJob job;
         public Transforms(World world) : base(world)
         {
             IncludCount = 2;
@@ -146,6 +147,7 @@ public class SyncTransformSystem : UpdateSystem
         internal override void Clear()
         {
             disposed = true;
+            job.Clear();
             transformAccessArray.Dispose();
         }
 

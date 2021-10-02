@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2744982186770112523}
   - component: {fileID: 2744982186770112516}
   - component: {fileID: 1944518598305511157}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -125,6 +125,11 @@ MonoBehaviour:
     generation: 0
   Components:
   - id: 0
+  - id: 1
+  - id: 2
+  - id: 3
+  - id: 4
+  - id: 5
   runTime: 0
   destroyObject: 0
   destroyComponent: 0
@@ -136,6 +141,23 @@ MonoBehaviour:
       data:
         MoveToTargetValue: {fileID: 0}
         NavMeshAgentVelue: {fileID: 2744982186770112523}
+    00000001:
+      type: {class: CanTakeDamageByExplosion, ns: , asm: Assembly-CSharp}
+    00000002:
+      type: {class: NoBurst, ns: , asm: Assembly-CSharp}
+    00000003:
+      type: {class: TransformRef, ns: , asm: Assembly-CSharp}
+      data:
+        Value: {fileID: 2744982186770112521}
+    00000004:
+      type: {class: TransformComponent, ns: , asm: Assembly-CSharp}
+      data:
+        position: {x: 0, y: 0, z: 0}
+        scale: {x: 1, y: 1, z: 1}
+        rotation: {x: 0, y: 0, z: 0, w: 0}
+        right: {x: 0, y: 0, z: 0}
+    00000005:
+      type: {class: EnemySpawnEvent, ns: , asm: Assembly-CSharp}
 --- !u!136 &1944518598305511157
 CapsuleCollider:
   m_ObjectHideFlags: 0

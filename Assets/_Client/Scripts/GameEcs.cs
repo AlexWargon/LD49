@@ -20,10 +20,12 @@ public class GameEcs : MonoBehaviour
                 .Add(new WeaponSwaySystem())
                 .Add(new ProjectileMoveSystem())
                 .Add(new EnergyBallCollisionSystem())
-                
+                .Add(new StartSyncTransformsSystem())
                 //.Add(new ExplosionCollisionSystem())
+                
                 .Add(new PostExplosionCollisionEnemySystem())
                 .Add(new PostExplosionCollisionRocksSystem())
+                .Add(new BurstFlyEnemySystem())
                 .Add(new LifeTimeSystem())
                 .Add(new PlayParticleOnSpawnSystem())
                 .Add(new EnemyMoveSystem())
@@ -47,7 +49,19 @@ public class GameEcs : MonoBehaviour
         }
     }
 }
-
+[EcsComponent] public class EnemySpawnEvent{}
+public class StartSyncTransformsSystem : UpdateSystem
+{
+    public override void Update()
+    {
+        entities.Without<UnActive>().Each((EnemySpawnEvent evnt, TransformRef transform, ref TransformComponent transformComponent) =>
+        {
+            transformComponent.position = transform.Value.position;
+            transformComponent.scale = transform.Value.localScale;
+            transformComponent.rotation = transform.Value.rotation;
+        });
+    }
+}
 public class ClearEventsSystem : UpdateSystem
 {
     public override void Update()
@@ -55,6 +69,7 @@ public class ClearEventsSystem : UpdateSystem
         entities.Each((Entity e, PooledEvent evnt)=> e.Remove<PooledEvent>());
         entities.Each((Entity e, Collided evnt)=> e.Remove<Collided>());
         entities.Each((Entity e, DamagedByExplosion evnt)=> e.Remove<DamagedByExplosion>());
+        entities.Each((Entity e, EnemySpawnEvent evnt)=> e.Remove<EnemySpawnEvent>());
     }
 }
 public class PlayerInpuntSystem : UpdateSystem
@@ -131,7 +146,6 @@ public class PlayerAttackSystem : UpdateSystem
         {
             entities.Each((Player playerTag, ref RayCastRef playerCast) =>
             {
-
                 playerCast.Ray = camera.ScreenPointToRay(Input.mousePosition);
                 if (input.PressFire && weapon.Loaded)
                 {
@@ -348,6 +362,8 @@ public struct FlyWithBurst
     public float Delay;
     public float Force;
     public bool Grounded;
+    public float SpeedRotation;
+    public float MaxY;
 }
 
 public class BurstFlyEnemySystem : UpdateSystem
@@ -357,6 +373,15 @@ public class BurstFlyEnemySystem : UpdateSystem
     {
         j0b.dt = Time.deltaTime;
         entities.EachWithJob<FlyEnemyJob, FlyWithBurst, TransformComponent>(ref j0b);
+        entities.Each((Entity entity,  ref FlyWithBurst fly) =>
+        {
+            if (fly.Grounded)
+            {
+                //entity.Set<NoBurst>();
+                entity.Remove<FlyWithBurst>();
+            }
+                
+        });
     }
     public struct FlyEnemyJob : IJobExecute<FlyWithBurst, TransformComponent>
     {
@@ -367,32 +392,43 @@ public class BurstFlyEnemySystem : UpdateSystem
             {
                 transform.position += fly.Direction * fly.Force * dt;
                 fly.Delay += dt;
+                fly.Direction.y -= dt * 0.5f;
+                // var rot = transform.rotation.eulerAngles;
+                // rot.z += fly.SpeedRotation * dt;
+                // transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, rot.z), 0.1f);
             }
 
             if (fly.Delay > 1)
             {
-                if (transform.position.y < 0.1f)
+                if (transform.position.y < 1f)
                     fly.Grounded = true;
             }
             
-            
+
         }
     }
 }
-[EcsComponent]
-public class CurveLine
-{
-    public AnimationCurve Value;
-}
-
 public class PostExplosionCollisionEnemySystem : UpdateSystem
 {
     public override void Update()
     {
-        entities.Without<RookRef>().Each((Entity entity, DamagedByExplosion damaged, RigidBody rb, CanTakeDamageByExplosion tag, EnemyRef enemy) =>
+        entities.Without<RookRef>().Each((Entity entity, DamagedByExplosion damaged, TransformRef transformRef, CanTakeDamageByExplosion tag, EnemyRef enemy, NoBurst noBurst) =>
         {
-            var force = (rb.Value.position - damaged.From).normalized * damaged.Power; 
-            rb.Value.AddForce(force, ForceMode.Impulse);
+            Debug.Log("SSS");
+            enemy.NavMeshAgentVelue.enabled = false;
+            //var force = (transformRef.Value.position - damaged.From).normalized * damaged.Power; 
+            //rb.Value.AddForce(force, ForceMode.Impulse);
+            var dir = (transformRef.Value.position - damaged.From).normalized;
+            if (dir.y < 0)
+                dir.y = Random.Range(0.4f, 1f);
+            var flyForce = new FlyWithBurst
+            {
+                Direction = dir,
+                Force = damaged.Power,
+                MaxY =  Random.Range(5,15)
+            };
+            entity.Remove<NoBurst>();
+            entity.Add(flyForce);
         });
     }
 }
@@ -430,7 +466,7 @@ public class EnemyMoveSystem : UpdateSystem
 {
     public override void Update()
     {
-        entities.Without<UnActive>().Each((EnemyRef enemyRef) =>
+        entities.Without<UnActive>().Each((EnemyRef enemyRef, ref NoBurst tag) =>
         {
             enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
         });
