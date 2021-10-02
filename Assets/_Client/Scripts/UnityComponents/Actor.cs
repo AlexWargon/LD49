@@ -69,7 +69,7 @@ public class Actor : MonoBehaviour
     private Vector3 m_ContactPoint;
     private bool m_PlayerControl = false;
     private int m_JumpTimer;
-
+    private bool usingKeyboard;
 
     private void Start()
     {
@@ -82,11 +82,28 @@ public class Actor : MonoBehaviour
         m_RayDistance = m_Controller.height * .5f + m_Controller.radius;
         m_SlideLimit = m_Controller.slopeLimit - .1f;
         m_JumpTimer = m_AntiBunnyHopFactor;
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.lockState = CursorLockMode.Confined;
     }
 
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            usingKeyboard = !usingKeyboard;
+            Debug.Log(usingKeyboard);
+            if (usingKeyboard)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                //Cursor.lockState = CursorLockMode.Confined;
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.None;
+            }
+        }
 
         // If the run button is set to toggle, then switch between walk/run speed. (We use Update for this...
         // FixedUpdate is a poor place to use GetButtonDown, since it doesn't necessarily run every frame and can miss the event)
