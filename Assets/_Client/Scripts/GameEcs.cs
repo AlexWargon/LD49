@@ -1,22 +1,24 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.AI;
 using Wargon.ezs;
 using Wargon.ezs.Unity;
 using Random = UnityEngine.Random;
 
 public class GameEcs : MonoBehaviour
 {
+    public EnemySpawner EnemySpawner;
     public static World World;
     private Systems updateSystems;
     private void Awake()
     {
         World = new World();
         MonoConverter.Init(World);
+        Servise<GameService>.Set(new GameService());
+        Servise<EnemySpawner>.Set(EnemySpawner);
+        StartCoroutine(SpawnerDelay());
+        
         updateSystems = new Systems(World)
 
                 .Add(new PlayerInpuntSystem())
@@ -28,10 +30,11 @@ public class GameEcs : MonoBehaviour
                 .Add(new OnEnemySpawnSystem())
                 //.Add(new ExplosionCollisionSystem())
                 
-                .Add(new EnemySpriteAnimationSystem())
                 .Add(new EnemyAISystem())
-                .Add(new EnemyAttakStateSystem())
+                .Add(new EnemySpriteAnimationSystem())
                 
+                .Add(new EnemyAttakStateSystem())
+                .Add(new DeadEnemyLayDownCountDonwSystem())
                 .Add(new GameOverSystem())
                 
                 .Add(new PostExplosionCollisionEnemySystem())
@@ -52,7 +55,11 @@ public class GameEcs : MonoBehaviour
         updateSystems.Init();
     }
 
-    // Update is called once per frame
+    IEnumerator SpawnerDelay()
+    {
+        yield return new WaitForSeconds(0.1f);
+        EnemySpawner.Init();
+    }
     void Update()
     {
         if (World != null)
@@ -60,31 +67,23 @@ public class GameEcs : MonoBehaviour
             updateSystems.OnUpdate();
         }
     }
+    
 }
 [EcsComponent] public struct SpawnedEvent{}
 
-public static class Servise<T> where T : class, new()
-{
-    private static T instance;
-    static Servise()
-    {
-        if (instance == null)
-            instance = new T();
-    }
-    
-    public static T Get() => instance;
-}
 public class GameService
 {
     public Entity PlayerEntity;
+    public Transform PlayerTrasform;
 }
 public class OnPlayerSpawnSystem : UpdateSystem
 {
     public override void Update()
     {
-        entities.Each((Entity Entity, Player player, SpawnedEvent spawned) =>
+        entities.Each((Entity Entity, Player player, SpawnedEvent spawned, TransformRef transformRef) =>
         {
             Servise<GameService>.Get().PlayerEntity = Entity;
+            Servise<GameService>.Get().PlayerTrasform = transformRef.Value;
         });
     }
 }
@@ -108,13 +107,14 @@ public class OnEnemySpawnSystem : UpdateSystem
 {
     public override void Update()
     {
-        entities.Without<UnActive>().Each((EnemySpawnEvent evnt, TransformRef transform, SpriteAnim anim, EnemyRef enemyRef, ref TransformComponent transformComponent) =>
+        entities.Without<Dead>().Each((EnemySpawnEvent evnt, TransformRef transform, SpriteAnim anim, EnemyRef enemyRef, ref TransformComponent transformComponent) =>
         {
             transformComponent.position = transform.Value.position;
             transformComponent.scale = transform.Value.localScale;
             transformComponent.rotation = transform.Value.rotation;
             anim.Value.Run.CurrentAnimation = Random.Range(0, anim.Value.Run.Frames.Length - 1);
             enemyRef.TargetEntity = Servise<GameService>.Get().PlayerEntity;
+            enemyRef.MoveToTargetValue = Servise<GameService>.Get().PlayerTrasform;
         });
     }
 }
@@ -188,7 +188,7 @@ public class WeaponSwaySystem : UpdateSystem
             movementX = Mathf.Clamp(movementX, -sway.maxAmount, sway.maxAmount);
             movementY = Mathf.Clamp(movementY, -sway.maxAmount, sway.maxAmount);
 
-            Vector3 finalPostion = new Vector3(movementX, movementY, 0);
+            var finalPostion = new Vector3(movementX, movementY, 0);
             transform.localPosition = Vector3.Lerp(transform.localPosition, finalPostion + sway.initialPosition, Time.deltaTime * sway.smoothAmount);
         });
     }
@@ -427,7 +427,7 @@ public struct FlyWithBurst
 {
     public Collider Value;
 }
-[EcsComponent] public struct Dead{}
+[EcsComponent] public class Dead{}
 public class BurstFlyEnemySystem : UpdateSystem
 {
     private FlyEnemyJob j0b;
@@ -616,10 +616,8 @@ public class EnemyAttakStateSystem : UpdateSystem
         var dt = Time.deltaTime;
         entities.Without<Dead>().Each((Entity entity, EnemyRef enemy, Damage damage, AttackState state) =>
         {
-            Debug.Log("ATACK STATE");
             if (enemy.CurrentAttackDelay <= 0)
             {
-                Debug.Log("DO DAMAGE");
                 if (enemy.TargetEntity.IsDead())
                 {
                     Debug.Log("PLayer Dead");
@@ -695,6 +693,30 @@ public class EnemySpriteAnimationSystem : UpdateSystem
             render.sprite = animation.Frames[animation.CurrentAnimation];
             animator.CurruntFrameTime = 0f;
         }
+    }
+}
+[EcsComponent] 
+public class StayDeadCountDown
+{
+    public float Default;
+    public float Value;
+}
 
+[EcsComponent]
+public class View
+{
+    public MonoEntity Value;
+}
+public class DeadEnemyLayDownCountDonwSystem : UpdateSystem
+{
+    public override void Update()
+    {
+        var dt = Time.deltaTime;
+        entities.Each((Dead Dead, StayDeadCountDown deadCountDown, View view) =>
+        {
+            deadCountDown.Value -= dt;
+            if(deadCountDown.Value <= 0)
+                Servise<EnemySpawner>.Get().BackToPool(view.Value, deadCountDown);
+        });
     }
 }

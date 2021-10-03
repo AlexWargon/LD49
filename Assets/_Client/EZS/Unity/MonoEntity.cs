@@ -108,6 +108,6 @@ namespace Wargon.ezs.Unity {
         public MonoEntity Value;
     }
     [EcsComponent] 
-    public struct UnActive { }
+    public class UnActive { }
 }
 

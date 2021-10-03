@@ -334,6 +334,7 @@ MonoBehaviour:
   - id: 1
   - id: 2
   - id: 3
+  - id: 4
   runTime: 0
   destroyObject: 0
   destroyComponent: 0
@@ -354,6 +355,10 @@ MonoBehaviour:
       type: {class: Health, ns: , asm: Assembly-CSharp}
       data:
         Value: 200
+    00000004:
+      type: {class: TransformRef, ns: , asm: Assembly-CSharp}
+      data:
+        Value: {fileID: 3856945881406288969}
 --- !u!1 &3889480350460252381
 GameObject:
   m_ObjectHideFlags: 0
