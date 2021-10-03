@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -5,6 +6,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using Wargon.ezs;
 using Wargon.ezs.Unity;
+using Random = UnityEngine.Random;
 
 public class GameEcs : MonoBehaviour
 {
@@ -21,9 +23,9 @@ public class GameEcs : MonoBehaviour
                 .Add(new WeaponSwaySystem())
                 .Add(new ProjectileMoveSystem())
                 .Add(new EnergyBallCollisionSystem())
-                .Add(new StartSyncTransformsSystem())
+                .Add(new OnEnemySpawnSystem())
                 //.Add(new ExplosionCollisionSystem())
-                
+                .Add(new EnemySpriteAnimationSystem())
                 .Add(new PostExplosionCollisionEnemySystem())
                 .Add(new PostExplosionCollisionRocksSystem())
                 .Add(new BurstFlyEnemySystem())
@@ -68,15 +70,16 @@ public class OnBulletBackToPoolExplosionSystem : UpdateSystem
     }
 }
 [EcsComponent] public class EnemySpawnEvent{}
-public class StartSyncTransformsSystem : UpdateSystem
+public class OnEnemySpawnSystem : UpdateSystem
 {
     public override void Update()
     {
-        entities.Without<UnActive>().Each((EnemySpawnEvent evnt, TransformRef transform, ref TransformComponent transformComponent) =>
+        entities.Without<UnActive>().Each((EnemySpawnEvent evnt, TransformRef transform, SpriteAnim anim, ref TransformComponent transformComponent) =>
         {
             transformComponent.position = transform.Value.position;
             transformComponent.scale = transform.Value.localScale;
             transformComponent.rotation = transform.Value.rotation;
+            anim.Value.Run.CurrentAnimation = Random.Range(0, anim.Value.Run.Frames.Length - 1);
         });
     }
 }
@@ -507,5 +510,60 @@ public class EnemyMoveSystem : UpdateSystem
         {
             enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
         });
+    }
+}
+
+[EcsComponent]
+public class SpriteAnim
+{
+    public SpriteAnimation Value;
+}
+
+[EcsComponent]
+public class SpriteRender
+{
+    public SpriteRenderer Value;
+}
+public class EnemySpriteAnimationSystem : UpdateSystem
+{
+    public override void Update()
+    {
+        var dt = Time.deltaTime;
+        entities.Without<Dead>().Each((EnemyRef EnemyRef, SpriteAnim animation, SpriteRender render) =>
+        {
+            var spriteRenderer = render.Value;
+            var spriteAnimation = animation.Value;
+            switch (EnemyRef.State)
+            {
+                case EnemyState.Run:
+                    PlayAnimation(ref spriteAnimation.Run, animation.Value, spriteRenderer,dt);
+                    break;
+                case EnemyState.Attack:
+                    PlayAnimation(ref spriteAnimation.Attack, animation.Value, spriteRenderer,dt);
+                    break;
+                case EnemyState.Death:
+                    PlayAnimation(ref spriteAnimation.Death, animation.Value, spriteRenderer,dt);
+                    break;
+                case EnemyState.Dead:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        });
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void PlayAnimation(ref Animation animation, SpriteAnimation animator, SpriteRenderer render, float dt)
+    {
+        animator.CurruntFrameTime += dt;
+        if (animator.CurruntFrameTime >= animator.FrameTime)
+        {
+            animation.CurrentAnimation++;
+            if (animation.CurrentAnimation == animation.Frames.Length)
+                animation.CurrentAnimation = 0;
+            render.sprite = animation.Frames[animation.CurrentAnimation];
+            animator.CurruntFrameTime = 0f;
+        }
+
     }
 }

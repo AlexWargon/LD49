@@ -121,4 +121,13 @@ public class EnemyRef
 {
     public Transform MoveToTargetValue;
     public NavMeshAgent NavMeshAgentVelue;
+    public EnemyState State;
+}
+
+public enum EnemyState
+{
+    Run,
+    Attack,
+    Death,
+    Dead
 }

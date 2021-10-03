@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2744982186770112523}
   - component: {fileID: 2744982186770112516}
   - component: {fileID: 1944518598305511157}
+  - component: {fileID: 3859041079902915414}
   m_Layer: 7
   m_Name: Enemy
   m_TagString: Untagged
@@ -74,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -9095717837082945937, guid: bd3cb4af8406d4436a2ae8c2aafe1f8d,
+  m_Sprite: {fileID: -7812756242749062547, guid: d856f11842859454d8d7d6974a6416eb,
     type: 3}
   m_Color: {r: 0.6603774, g: 0.3769135, b: 0.3769135, a: 1}
   m_FlipX: 0
@@ -104,8 +105,8 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 1
+  m_Height: 4.39
+  m_BaseOffset: 2.42
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
 --- !u!114 &2744982186770112516
@@ -131,6 +132,8 @@ MonoBehaviour:
   - id: 4
   - id: 5
   - id: 6
+  - id: 7
+  - id: 8
   runTime: 0
   destroyObject: 0
   destroyComponent: 0
@@ -142,6 +145,7 @@ MonoBehaviour:
       data:
         MoveToTargetValue: {fileID: 0}
         NavMeshAgentVelue: {fileID: 2744982186770112523}
+        State: 0
     00000001:
       type: {class: CanTakeDamageByExplosion, ns: , asm: Assembly-CSharp}
     00000002:
@@ -163,6 +167,14 @@ MonoBehaviour:
       type: {class: ColliderRef, ns: , asm: Assembly-CSharp}
       data:
         Value: {fileID: 1944518598305511157}
+    00000007:
+      type: {class: SpriteAnim, ns: , asm: Assembly-CSharp}
+      data:
+        Value: {fileID: 3859041079902915414}
+    00000008:
+      type: {class: SpriteRender, ns: , asm: Assembly-CSharp}
+      data:
+        Value: {fileID: 2744982186770112522}
 --- !u!136 &1944518598305511157
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -174,6 +186,37 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
-  m_Height: 2
+  m_Height: 3.58
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: -0.66, z: 0}
+--- !u!114 &3859041079902915414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2744982186770112517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d71f35d329581cc4dba0ea5ab1398e92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FrameTime: 0.125
+  CurruntFrameTime: 0
+  Run:
+    CurrentAnimation: 0
+    Frames:
+    - {fileID: -7812756242749062547, guid: d856f11842859454d8d7d6974a6416eb, type: 3}
+    - {fileID: 6687482871463974468, guid: d856f11842859454d8d7d6974a6416eb, type: 3}
+    - {fileID: -5432680973155976348, guid: d856f11842859454d8d7d6974a6416eb, type: 3}
+    - {fileID: 6010194029817120948, guid: d856f11842859454d8d7d6974a6416eb, type: 3}
+    - {fileID: 8192453005050525247, guid: d856f11842859454d8d7d6974a6416eb, type: 3}
+    - {fileID: 2526154844060452534, guid: d856f11842859454d8d7d6974a6416eb, type: 3}
+    - {fileID: 8928800334851889458, guid: d856f11842859454d8d7d6974a6416eb, type: 3}
+    - {fileID: 8940546937892732261, guid: d856f11842859454d8d7d6974a6416eb, type: 3}
+  Attack:
+    CurrentAnimation: 0
+    Frames: []
+  Death:
+    CurrentAnimation: 0
+    Frames: []

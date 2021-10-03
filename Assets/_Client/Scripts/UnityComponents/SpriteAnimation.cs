@@ -15,5 +15,6 @@ public class SpriteAnimation : MonoBehaviour
 [Serializable]
 public struct Animation
 {
+    public int CurrentAnimation;
     public Sprite[] Frames;
 }
