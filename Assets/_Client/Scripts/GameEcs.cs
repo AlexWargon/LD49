@@ -547,7 +547,7 @@ public class EnemyMoveSystem : UpdateSystem
 {
     public override void Update()
     {
-        entities.Without<UnActive, Dead>().Each((EnemyRef enemyRef, RunState runState, ref NoBurst tag) =>
+        entities.Without<Dead>().Each((EnemyRef enemyRef, RunState runState, ref NoBurst tag) =>
         {
             enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
         });
@@ -571,7 +571,7 @@ public class EnemyAISystem : UpdateSystem
 {
     public override void Update()
     {
-        entities.Without<UnActive>().Each((Entity entity, EnemyRef enemy, TransformRef TransformRef) =>
+        entities.Without<Dead>().Each((Entity entity, EnemyRef enemy, TransformRef TransformRef) =>
         {
             var transform = TransformRef.Value;
             var distance = Vector3.Distance(transform.position, enemy.MoveToTargetValue.position);
@@ -614,7 +614,7 @@ public class EnemyAttakStateSystem : UpdateSystem
     public override void Update()
     {
         var dt = Time.deltaTime;
-        entities.Without<UnActive>().Each((Entity entity, EnemyRef enemy, Damage damage, AttackState state) =>
+        entities.Without<Dead>().Each((Entity entity, EnemyRef enemy, Damage damage, AttackState state) =>
         {
             Debug.Log("ATACK STATE");
             if (enemy.CurrentAttackDelay <= 0)
