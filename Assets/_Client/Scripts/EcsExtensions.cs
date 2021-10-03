@@ -266,12 +266,6 @@ public struct EachWithJob<A, Executor> : IJobParallelFor
         executionFunc = action;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Free()
-    {
-        NativeMagic.UnwrapFromNative(Entites);
-        NativeMagic.UnwrapFromNative(ItemsA);
-    }
 
     public void Execute(int index)
     {
@@ -299,13 +293,6 @@ public struct EachWithJob<A, B, Executor> : IJobParallelFor
         ItemsA = NativeMagic.WrapToNative(itemsA);
         ItemsB = NativeMagic.WrapToNative(itemsB);
         executionFunc = action;
-    }
-
-    public void Free()
-    {
-        NativeMagic.UnwrapFromNative(Entites);
-        NativeMagic.UnwrapFromNative(ItemsA);
-        NativeMagic.UnwrapFromNative(ItemsB);
     }
 
     public void Execute(int index)
@@ -339,13 +326,6 @@ public struct EachWithJob<A, B, C, Executor> : IJobParallelFor
         ItemsB = NativeMagic.WrapToNative(itemsB);
         ItemsC = NativeMagic.WrapToNative(itemsC);
         executionFunc = action;
-    }
-
-    public void Free()
-    {
-        NativeMagic.UnwrapFromNative(Entites);
-        NativeMagic.UnwrapFromNative(ItemsA);
-        NativeMagic.UnwrapFromNative(ItemsB);
     }
 
     public void Execute(int index)
@@ -384,15 +364,6 @@ public struct EachWithJob<A, B, C, D, Executor> : IJobParallelFor
         ItemsC = NativeMagic.WrapToNative(itemsC);
         ItemsD = NativeMagic.WrapToNative(itemsD);
         executionFunc = action;
-    }
-
-    public void Free()
-    {
-        NativeMagic.UnwrapFromNative(Entites);
-        NativeMagic.UnwrapFromNative(ItemsA);
-        NativeMagic.UnwrapFromNative(ItemsB);
-        NativeMagic.UnwrapFromNative(ItemsC);
-        NativeMagic.UnwrapFromNative(ItemsD);
     }
 
     public void Execute(int index)
@@ -440,16 +411,6 @@ public struct EachWithJob<A, B, C, D, E, Executor> : IJobParallelFor
         executionFunc = action;
     }
 
-    public void Free()
-    {
-        NativeMagic.UnwrapFromNative(Entites);
-        NativeMagic.UnwrapFromNative(ItemsA);
-        NativeMagic.UnwrapFromNative(ItemsB);
-        NativeMagic.UnwrapFromNative(ItemsC);
-        NativeMagic.UnwrapFromNative(ItemsD);
-        NativeMagic.UnwrapFromNative(ItemsE);
-    }
-
     public void Execute(int index)
     {
         var entity = Entites.Array[index];
@@ -487,23 +448,27 @@ internal static class NativeMagic
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref nativeData, sh);
             return new NativeWrappedData<T> {Array = nativeData, SafetyHandle = sh};
 #else
-            return new NativeWrappedData<T> { Array =
- NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T> (ptr, managedData.Length, Allocator.None) };
+            return new NativeWrappedData<T> { Array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T> (ptr, managedData.Length, Allocator.None) };
 #endif
         }
     }
-
+#if UNITY_EDITOR
     public static void UnwrapFromNative<T>(NativeWrappedData<T> sh) where T : unmanaged
     {
         AtomicSafetyHandle.CheckDeallocateAndThrow(sh.SafetyHandle);
         AtomicSafetyHandle.Release(sh.SafetyHandle);
     }
+#endif
 }
+
 
 public struct NativeWrappedData<TT> where TT : unmanaged
 {
-    [NativeDisableParallelForRestriction] public NativeArray<TT> Array;
+        [NativeDisableParallelForRestriction] public NativeArray<TT> Array;
 #if UNITY_EDITOR
     public AtomicSafetyHandle SafetyHandle;
 #endif
 }
+
+
+    

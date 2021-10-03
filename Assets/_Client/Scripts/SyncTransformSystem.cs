@@ -151,7 +151,9 @@ public class SyncTransformSystem : UpdateSystem
         internal override void Clear()
         {
             disposed = true;
+            #if UNITY_EDITOR
             job.Clear();
+            #endif
             transformAccessArray.Dispose();
         }
 
@@ -175,8 +177,10 @@ public class SyncTransformSystem : UpdateSystem
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Clear()
             {
+#if UNITY_EDITOR
                 NativeMagic.UnwrapFromNative(transformComponents);
                 NativeMagic.UnwrapFromNative(entities);
+#endif
             }
         }
     }
