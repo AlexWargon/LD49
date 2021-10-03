@@ -392,7 +392,7 @@ public struct FlyWithBurst
 public class BurstFlyEnemySystem : UpdateSystem
 {
     private FlyEnemyJob j0b;
-    private const float DEAD_Y_POS = 0.6f;
+    private const float DEAD_Y_POS = 0.4f;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private Quaternion DeadRotation()
@@ -414,10 +414,9 @@ public class BurstFlyEnemySystem : UpdateSystem
                 transform.Value.rotation = DeadRotation();
                 Collider.Value.enabled = false;
             }
-                
         });
     }
-    public struct FlyEnemyJob : IJobExecute<FlyWithBurst, TransformComponent>
+    struct FlyEnemyJob : IJobExecute<FlyWithBurst, TransformComponent>
     {
         public float deadpos;
         public float dt;
@@ -438,8 +437,6 @@ public class BurstFlyEnemySystem : UpdateSystem
                 if (transform.position.y < deadpos)
                     fly.Grounded = true;
             }
-            
-
         }
     }
 }
