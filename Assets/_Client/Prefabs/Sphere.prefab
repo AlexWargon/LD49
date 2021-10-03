@@ -236,7 +236,7 @@ MonoBehaviour:
     00000004:
       type: {class: MoveSpeed, ns: , asm: Assembly-CSharp}
       data:
-        Value: 8
+        Value: 20
     00000005:
       type: {class: Direction, ns: , asm: Assembly-CSharp}
       data:

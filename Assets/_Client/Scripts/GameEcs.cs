@@ -10,9 +10,11 @@ public class GameEcs : MonoBehaviour
 {
     public EnemySpawner EnemySpawner;
     public static World World;
+    public UIController UiController;
     private Systems updateSystems;
     private void Awake()
     {
+
         World = new World();
         MonoConverter.Init(World);
         Servise<GameService>.Set(new GameService());
@@ -650,6 +652,7 @@ public class GameOverSystem : UpdateSystem
         entities.Each((Entity entity, GameOver gameover) =>
         {
             Debug.Log("GAMEOVER");
+            Time.timeScale = 0;
             entity.Destroy();
         });
     }
