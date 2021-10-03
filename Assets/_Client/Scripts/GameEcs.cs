@@ -536,7 +536,9 @@ public class PostExplosionCollisionRocksSystem : UpdateSystem
                     rock.Remove<CanTakeDamageByExplosion>();
                 }
             }
-            entity.Remove<CanTakeDamageByExplosion>();
+            DOVirtual.DelayedCall(5f , () => { rigidBody.Value.isKinematic = true; });
+            
+            //entity.Remove<CanTakeDamageByExplosion>();
         });
     }
 }
