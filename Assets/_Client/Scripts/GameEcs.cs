@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.AI;
 using Wargon.ezs;
@@ -29,6 +30,7 @@ public class GameEcs : MonoBehaviour
                 .Add(new LifeTimeSystem())
                 .Add(new PlayParticleOnSpawnSystem())
                 .Add(new EnemyMoveSystem())
+                .Add(new OnBulletBackToPoolExplosionSystem())
                 .Add(new ClearEventsSystem())
 
                 .Add(new SyncTransformSystem())
@@ -47,6 +49,22 @@ public class GameEcs : MonoBehaviour
         {
             updateSystems.OnUpdate();
         }
+    }
+}
+
+public class OnBulletBackToPoolExplosionSystem : UpdateSystem
+{
+    public override void Update()
+    {
+        entities.Each((EnergyBall ball, TransformRef tr, Impact impact, ref BackToPoolEvent evnt) =>
+        {
+            var explosion = Pools.ReuseEntity(impact.Value, tr.Value.position, Quaternion.identity);
+            var multiply = ball.Power * 10f;
+            explosion.Get<ExplosionPower>().Value = multiply;
+            explosion.Get<SphereCastRef>().Radius = multiply;
+            var explosionTransform = explosion.Get<TransformRef>();
+            explosionTransform.Value.localScale = new Vector3(multiply, multiply, multiply);
+        });
     }
 }
 [EcsComponent] public class EnemySpawnEvent{}
@@ -70,6 +88,7 @@ public class ClearEventsSystem : UpdateSystem
         entities.Each((Entity e, Collided evnt)=> e.Remove<Collided>());
         entities.Each((Entity e, DamagedByExplosion evnt)=> e.Remove<DamagedByExplosion>());
         entities.Each((Entity e, EnemySpawnEvent evnt)=> e.Remove<EnemySpawnEvent>());
+        entities.Each((Entity e, BackToPoolEvent evnt)=> e.Remove<BackToPoolEvent>());
     }
 }
 public class PlayerInpuntSystem : UpdateSystem
@@ -365,26 +384,42 @@ public struct FlyWithBurst
     public float SpeedRotation;
     public float MaxY;
 }
-
+[EcsComponent] public struct ColliderRef
+{
+    public Collider Value;
+}
+[EcsComponent] public struct Dead{}
 public class BurstFlyEnemySystem : UpdateSystem
 {
     private FlyEnemyJob j0b;
+    private const float DEAD_Y_POS = 0.6f;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private Quaternion DeadRotation()
+    {
+        return Quaternion.Euler(90,Random.Range(0,360),90);
+    }
     public override void Update()
     {
+        j0b.deadpos = DEAD_Y_POS;
         j0b.dt = Time.deltaTime;
         entities.EachWithJob<FlyEnemyJob, FlyWithBurst, TransformComponent>(ref j0b);
-        entities.Each((Entity entity,  ref FlyWithBurst fly) =>
+        entities.Each((Entity entity, TransformRef transform, ColliderRef Collider, ref FlyWithBurst fly) =>
         {
             if (fly.Grounded)
             {
-                //entity.Set<NoBurst>();
+                entity.Set<Dead>();
+                entity.Set<NoBurst>();
                 entity.Remove<FlyWithBurst>();
+                transform.Value.rotation = DeadRotation();
+                Collider.Value.enabled = false;
             }
                 
         });
     }
     public struct FlyEnemyJob : IJobExecute<FlyWithBurst, TransformComponent>
     {
+        public float deadpos;
         public float dt;
         public void ForEach(ref FlyWithBurst fly, ref TransformComponent transform)
         {
@@ -393,14 +428,14 @@ public class BurstFlyEnemySystem : UpdateSystem
                 transform.position += fly.Direction * fly.Force * dt;
                 fly.Delay += dt;
                 fly.Direction.y -= dt * 0.5f;
-                // var rot = transform.rotation.eulerAngles;
-                // rot.z += fly.SpeedRotation * dt;
-                // transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, rot.z), 0.1f);
+                var rot = transform.rotation.eulerAngles;
+                rot.z += fly.SpeedRotation * dt;
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, rot.z), 0.1f);
             }
 
             if (fly.Delay > 1)
             {
-                if (transform.position.y < 1f)
+                if (transform.position.y < deadpos)
                     fly.Grounded = true;
             }
             
@@ -410,22 +445,28 @@ public class BurstFlyEnemySystem : UpdateSystem
 }
 public class PostExplosionCollisionEnemySystem : UpdateSystem
 {
+    private const float ROTATION_SPEED = 5500f;
     public override void Update()
     {
         entities.Without<RookRef>().Each((Entity entity, DamagedByExplosion damaged, TransformRef transformRef, CanTakeDamageByExplosion tag, EnemyRef enemy, NoBurst noBurst) =>
         {
-            Debug.Log("SSS");
             enemy.NavMeshAgentVelue.enabled = false;
             //var force = (transformRef.Value.position - damaged.From).normalized * damaged.Power; 
             //rb.Value.AddForce(force, ForceMode.Impulse);
             var dir = (transformRef.Value.position - damaged.From).normalized;
             if (dir.y < 0)
                 dir.y = Random.Range(0.4f, 1f);
+            float rSpeed;
+            if (dir.x > 0)
+                rSpeed = ROTATION_SPEED;
+            else
+                rSpeed = -ROTATION_SPEED;
             var flyForce = new FlyWithBurst
             {
                 Direction = dir,
                 Force = damaged.Power,
-                MaxY =  Random.Range(5,15)
+                MaxY =  Random.Range(5,15),
+                SpeedRotation =  rSpeed
             };
             entity.Remove<NoBurst>();
             entity.Add(flyForce);
@@ -442,7 +483,6 @@ public class PostExplosionCollisionRocksSystem : UpdateSystem
             rigidBody.Value.isKinematic = false;
             var force1 = (rigidBody.Value.position - damaged.From).normalized * damaged.Power * 5; 
             entity.Get<RigidBody>().Value.AddForce(force1, ForceMode.Impulse);
-            
             
             for (var i = rookRef.Other.Value.Count - 1; i >= 0; i--)
             {
@@ -466,7 +506,7 @@ public class EnemyMoveSystem : UpdateSystem
 {
     public override void Update()
     {
-        entities.Without<UnActive>().Each((EnemyRef enemyRef, ref NoBurst tag) =>
+        entities.Without<UnActive, Dead>().Each((EnemyRef enemyRef, ref NoBurst tag) =>
         {
             enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
         });

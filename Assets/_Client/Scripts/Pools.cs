@@ -313,6 +313,7 @@ public sealed class Pooled
         else
         {
             mono.Entity.Set<UnActive>();
+            mono.Entity.Set<BackToPoolEvent>();
         }
         mono.SetActive(value);
     }
@@ -364,8 +365,8 @@ public class PoolContainer
         transform.name = $"[Pool] {Name} [KeyID:{poolKey}]  Size:{size}";
     }
 }
-
-[EcsComponent] public class PooledEvent{}
+[EcsComponent] public struct BackToPoolEvent{}
+[EcsComponent] public struct PooledEvent{}
 
 [EcsComponent] public class TransformPure
 {
