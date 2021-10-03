@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.AI;
 using Wargon.ezs;
@@ -23,9 +24,16 @@ public class GameEcs : MonoBehaviour
                 .Add(new WeaponSwaySystem())
                 .Add(new ProjectileMoveSystem())
                 .Add(new EnergyBallCollisionSystem())
+                .Add(new OnPlayerSpawnSystem())
                 .Add(new OnEnemySpawnSystem())
                 //.Add(new ExplosionCollisionSystem())
+                
                 .Add(new EnemySpriteAnimationSystem())
+                .Add(new EnemyAISystem())
+                .Add(new EnemyAttakStateSystem())
+                
+                .Add(new GameOverSystem())
+                
                 .Add(new PostExplosionCollisionEnemySystem())
                 .Add(new PostExplosionCollisionRocksSystem())
                 .Add(new BurstFlyEnemySystem())
@@ -53,7 +61,33 @@ public class GameEcs : MonoBehaviour
         }
     }
 }
+[EcsComponent] public struct SpawnedEvent{}
 
+public static class Servise<T> where T : class, new()
+{
+    private static T instance;
+    static Servise()
+    {
+        if (instance == null)
+            instance = new T();
+    }
+    
+    public static T Get() => instance;
+}
+public class GameService
+{
+    public Entity PlayerEntity;
+}
+public class OnPlayerSpawnSystem : UpdateSystem
+{
+    public override void Update()
+    {
+        entities.Each((Entity Entity, Player player, SpawnedEvent spawned) =>
+        {
+            Servise<GameService>.Get().PlayerEntity = Entity;
+        });
+    }
+}
 public class OnBulletBackToPoolExplosionSystem : UpdateSystem
 {
     public override void Update()
@@ -74,12 +108,13 @@ public class OnEnemySpawnSystem : UpdateSystem
 {
     public override void Update()
     {
-        entities.Without<UnActive>().Each((EnemySpawnEvent evnt, TransformRef transform, SpriteAnim anim, ref TransformComponent transformComponent) =>
+        entities.Without<UnActive>().Each((EnemySpawnEvent evnt, TransformRef transform, SpriteAnim anim, EnemyRef enemyRef, ref TransformComponent transformComponent) =>
         {
             transformComponent.position = transform.Value.position;
             transformComponent.scale = transform.Value.localScale;
             transformComponent.rotation = transform.Value.rotation;
             anim.Value.Run.CurrentAnimation = Random.Range(0, anim.Value.Run.Frames.Length - 1);
+            enemyRef.TargetEntity = Servise<GameService>.Get().PlayerEntity;
         });
     }
 }
@@ -92,6 +127,7 @@ public class ClearEventsSystem : UpdateSystem
         entities.Each((Entity e, DamagedByExplosion evnt)=> e.Remove<DamagedByExplosion>());
         entities.Each((Entity e, EnemySpawnEvent evnt)=> e.Remove<EnemySpawnEvent>());
         entities.Each((Entity e, BackToPoolEvent evnt)=> e.Remove<BackToPoolEvent>());
+        entities.Each((Entity e, SpawnedEvent evnt)=> e.Remove<SpawnedEvent>());
     }
 }
 public class PlayerInpuntSystem : UpdateSystem
@@ -185,8 +221,8 @@ public class PlayerAttackSystem : UpdateSystem
                     scale.y += dt * 2f;
                     scale.z += dt * 2f;
                     sphereTransform.Value.localScale = scale;
-                    energyBall.Power += dt * 2f;
-                    energyBall.Size += dt * 2f;
+                    energyBall.Power += dt * 1f;
+                    energyBall.Size += dt * 1f;
                     return;
                 }
                 //SHOOT
@@ -468,6 +504,9 @@ public class PostExplosionCollisionEnemySystem : UpdateSystem
                 MaxY =  Random.Range(5,15),
                 SpeedRotation =  rSpeed
             };
+            ref var transform = ref entity.GetRef<TransformComponent>();
+            transform.position = transformRef.Value.position;
+            transform.rotation = transformRef.Value.rotation;
             entity.Remove<NoBurst>();
             entity.Add(flyForce);
         });
@@ -478,7 +517,7 @@ public class PostExplosionCollisionRocksSystem : UpdateSystem
 {
     public override void Update()
     {
-        entities.Each((Entity entity,DamagedByExplosion damaged, RigidBody rigidBody, RookRef rookRef, CanTakeDamageByExplosion tag) =>
+        entities.Each((Entity entity, DamagedByExplosion damaged, RigidBody rigidBody, RookRef rookRef, CanTakeDamageByExplosion tag) =>
         {
             rigidBody.Value.isKinematic = false;
             var force1 = (rigidBody.Value.position - damaged.From).normalized * damaged.Power * 5; 
@@ -506,7 +545,7 @@ public class EnemyMoveSystem : UpdateSystem
 {
     public override void Update()
     {
-        entities.Without<UnActive, Dead>().Each((EnemyRef enemyRef, ref NoBurst tag) =>
+        entities.Without<UnActive, Dead>().Each((EnemyRef enemyRef, RunState runState, ref NoBurst tag) =>
         {
             enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
         });
@@ -524,6 +563,97 @@ public class SpriteRender
 {
     public SpriteRenderer Value;
 }
+[EcsComponent] public class AttackState{}
+[EcsComponent] public class RunState{}
+public class EnemyAISystem : UpdateSystem
+{
+    public override void Update()
+    {
+        entities.Without<UnActive>().Each((Entity entity, EnemyRef enemy, TransformRef TransformRef) =>
+        {
+            var transform = TransformRef.Value;
+            var distance = Vector3.Distance(transform.position, enemy.MoveToTargetValue.position);
+            if (distance <= enemy.AttackRange)
+            {
+                enemy.State = EnemyState.Attack;
+                entity.Set<AttackState>();
+                entity.Remove<RunState>();
+            }
+            else
+            {
+                enemy.State = EnemyState.Run;
+                entity.Set<RunState>();
+                entity.Remove<AttackState>();
+            }
+        });
+        
+    }
+}
+
+[EcsComponent]
+public class Damaged
+{
+    public int Damage;
+}
+
+[EcsComponent]
+public class Health
+{
+    public int Value;
+}
+
+[EcsComponent]
+public class Damage
+{
+    public int Value;
+}
+public class EnemyAttakStateSystem : UpdateSystem
+{
+    public override void Update()
+    {
+        var dt = Time.deltaTime;
+        entities.Without<UnActive>().Each((Entity entity, EnemyRef enemy, Damage damage, AttackState state) =>
+        {
+            Debug.Log("ATACK STATE");
+            if (enemy.CurrentAttackDelay <= 0)
+            {
+                Debug.Log("DO DAMAGE");
+                if (enemy.TargetEntity.IsDead())
+                {
+                    Debug.Log("PLayer Dead");
+                    return;
+                }
+                
+                var playerHp = enemy.TargetEntity.Get<Health>();
+                playerHp.Value -= damage.Value;
+                if (playerHp.Value <= 0)
+                {
+                    world.CreateEntity().Set<GameOver>();
+                }
+                
+                enemy.CurrentAttackDelay = enemy.AttackDelay;
+            }
+            enemy.CurrentAttackDelay -= dt;
+        });
+    }
+}
+
+[EcsComponent]
+public class GameOver
+{
+    
+}
+public class GameOverSystem : UpdateSystem
+{
+    public override void Update()
+    {
+        entities.Each((Entity entity, GameOver gameover) =>
+        {
+            Debug.Log("GAMEOVER");
+            entity.Destroy();
+        });
+    }
+}
 public class EnemySpriteAnimationSystem : UpdateSystem
 {
     public override void Update()
@@ -538,16 +668,15 @@ public class EnemySpriteAnimationSystem : UpdateSystem
                 case EnemyState.Run:
                     PlayAnimation(ref spriteAnimation.Run, animation.Value, spriteRenderer,dt);
                     break;
-                case EnemyState.Attack:
-                    PlayAnimation(ref spriteAnimation.Attack, animation.Value, spriteRenderer,dt);
-                    break;
-                case EnemyState.Death:
-                    PlayAnimation(ref spriteAnimation.Death, animation.Value, spriteRenderer,dt);
-                    break;
-                case EnemyState.Dead:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                // case EnemyState.Attack:
+                //     PlayAnimation(ref spriteAnimation.Attack, animation.Value, spriteRenderer,dt);
+                //     break;
+                // case EnemyState.Death:
+                //     PlayAnimation(ref spriteAnimation.Death, animation.Value, spriteRenderer,dt);
+                //     break;
+                // case EnemyState.Dead:
+                //     break;
+
             }
         });
     }

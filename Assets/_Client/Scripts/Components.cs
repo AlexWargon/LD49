@@ -119,6 +119,10 @@ public class Impact
 [EcsComponent]
 public class EnemyRef
 {
+    public float CurrentAttackDelay;
+    public float AttackDelay;
+    public float AttackRange;
+    public Entity TargetEntity;
     public Transform MoveToTargetValue;
     public NavMeshAgent NavMeshAgentVelue;
     public EnemyState State;

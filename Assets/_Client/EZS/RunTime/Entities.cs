@@ -27,6 +27,7 @@
     public delegate void LambdaCR<A, B>(A a, ref B b);
     public delegate void LambdaCCR<A, B, C>(A a, B b, ref C c);
     public delegate void LambdaCCCR<A, B, C, D>(A a, B b, C c, ref D d);
+    public delegate void LambdaCCCCR<A, B, C, D, E>(A a, B b, C c, D d, ref E e);
     public delegate void LambdaCCCRR<A, B, C, D, E>(A a, B b, C c, ref D d, ref E e);
     public delegate void LambdaCCCCRR<A, B, C, D, E, F>(A a, B b, C c, D d, ref E e, ref F f);
     public delegate void LambdaCRefCCC<A, B, C, D, E>(A a, ref B b, C c, D d, E e) where B : unmanaged;

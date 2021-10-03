@@ -332,6 +332,8 @@ MonoBehaviour:
   Components:
   - id: 0
   - id: 1
+  - id: 2
+  - id: 3
   runTime: 0
   destroyObject: 0
   destroyComponent: 0
@@ -346,6 +348,12 @@ MonoBehaviour:
         Mask:
           serializedVersion: 2
           m_Bits: 0
+    00000002:
+      type: {class: SpawnedEvent, ns: , asm: Assembly-CSharp}
+    00000003:
+      type: {class: Health, ns: , asm: Assembly-CSharp}
+      data:
+        Value: 200
 --- !u!1 &3889480350460252381
 GameObject:
   m_ObjectHideFlags: 0
