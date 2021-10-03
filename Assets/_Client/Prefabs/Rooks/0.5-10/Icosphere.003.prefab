@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 8304601294756316211}
   - component: {fileID: 8304601294756316213}
   - component: {fileID: 8304601294756316212}
+  - component: {fileID: 7449374441006347041}
   m_Layer: 0
   m_Name: Icosphere.003
   m_TagString: Untagged
@@ -143,7 +144,7 @@ MonoBehaviour:
     00000000:
       type: {class: RookRef, ns: , asm: Assembly-CSharp}
       data:
-        Other: {fileID: 0}
+        Other: {fileID: 8304601294756316212}
     00000001:
       type: {class: RigidBody, ns: , asm: Assembly-CSharp}
       data:
@@ -162,9 +163,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 461b5db774dc18d4d8830eb8e621ce6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Value:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 8304601294756316213}
-  - {fileID: 0}
+  Value: []
+--- !u!208 &7449374441006347041
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8304601294756316208}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.029000001, y: 0.011000001, z: 0.008}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: -0.004, y: 0.001, z: 0.0050000004}
+  m_TimeToStationary: 0.5

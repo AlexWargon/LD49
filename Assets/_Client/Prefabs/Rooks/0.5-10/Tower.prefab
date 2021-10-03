@@ -332,10 +332,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Value:
   - {fileID: 4858090376393595144}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 8804902683167245704}
+  - {fileID: 903903123915481631}
+  - {fileID: 2520899654687385688}
+  - {fileID: 8955085371747544911}
 --- !u!1 &4858090376393595140
 GameObject:
   m_ObjectHideFlags: 0
@@ -529,7 +529,7 @@ Transform:
   m_GameObject: {fileID: 5978929786494736948}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 33.110462, y: -9.640873, z: 0.92184067}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 10, y: 10, z: 10}
   m_Children:
   - {fileID: 2956055982612602519}
   - {fileID: 6505160414784014348}

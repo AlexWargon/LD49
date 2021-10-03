@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 4838898040525531766}
   - component: {fileID: 4838898040525531764}
   - component: {fileID: 4838898040525531763}
+  - component: {fileID: -4491008593045174463}
   m_Layer: 0
   m_Name: Icosphere.001
   m_TagString: Untagged
@@ -162,9 +163,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 461b5db774dc18d4d8830eb8e621ce6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Value:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  Value: []
+--- !u!208 &-4491008593045174463
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4838898040525531767}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.006, y: 0.0050000004, z: 0.008}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: 0, y: 0, z: 0.008}
+  m_TimeToStationary: 0.5
