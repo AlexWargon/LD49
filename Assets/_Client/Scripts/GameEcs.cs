@@ -31,6 +31,7 @@ public class GameEcs : MonoBehaviour
                 .Add(new PlayerAttackSystem())
                 .Add(new WeaponSwaySystem())
                 .Add(new ProjectileMoveSystem())
+                .Add(new EnemyBulletsCollision())
                 .Add(new EnergyBallCollisionSystem())
                 .Add(new OnPlayerSpawnSystem())
                 .Add(new OnEnemySpawnSystem())
@@ -38,6 +39,9 @@ public class GameEcs : MonoBehaviour
                 .Add(new ComboSystem())
                 .Add(new EnemyAISystem())
                 .Add(new EnemySpriteAnimationSystem())
+                .Add(new MeleeAttackEnemySystem())
+                .Add(new RangeAttackEnemySystem())
+                .Add(new DamagePlayerByEnemyExplosionSystem())
                 //.Add(new EnemyAttakStateSystem())
                 .Add(new EnemyMoveSystem())
                 .Add(new DeadEnemyLayDownCountDonwSystem())
@@ -147,6 +151,7 @@ public class ClearEventsSystem : UpdateSystem
         entities.Each((Entity e, EnemySpawnEvent evnt)=> e.Remove<EnemySpawnEvent>());
         entities.Each((Entity e, BackToPoolEvent evnt)=> e.Remove<BackToPoolEvent>());
         entities.Each((Entity e, SpawnedEvent evnt)=> e.Remove<SpawnedEvent>());
+        entities.Each((Entity e, AttackEvent evnt)=> e.Remove<AttackEvent>());
     }
 }
 public class PlayerInpuntSystem : UpdateSystem
@@ -356,6 +361,20 @@ public class EnergyBallCollisionSystem : UpdateSystem
             var explosionTransform = explosion.Get<TransformRef>();
             explosionTransform.Value.localScale = new Vector3(multiply, multiply, multiply);
             pool.SetActive(false);
+        });
+        
+
+    }
+}
+
+public class EnemyBulletsCollision : UpdateSystem
+{
+    public override void Update()
+    {
+        entities.Without<UnActive>().Each((Collided collidedEvent, TransformRef transform, Impact impact, Pooled pool) =>
+        {
+            pool.SetActive(false);
+            Pools.ReuseEntity(impact.Value, transform.Value.position, Quaternion.identity);
         });
     }
 }
@@ -647,6 +666,7 @@ public class EnemyAISystem : UpdateSystem
             if (distance <= enemy.AttackRange)
             {
                 enemy.State = EnemyState.Attack;
+                enemy.NavMeshAgentVelue.SetDestination(transform.position);
                 entity.Set<AttackState>();
                 entity.Remove<RunState>();
             }
@@ -740,14 +760,10 @@ public class EnemySpriteAnimationSystem : UpdateSystem
                     break;
                 case EnemyState.Attack:
                     PlayAnimation(ref spriteAnimation.Attack, animation.Value, spriteRenderer,dt);
-                    if (spriteAnimation.Attack.CurrentAnimation == 9)
+                    if (spriteAnimation.Attack.CurrentAnimation == spriteAnimation.AttackFrame && spriteAnimation.AttackFrameEnd)
                     {
-                        var playerHp = enemy.TargetEntity.Get<Health>();
-                        playerHp.Value -= damage.Value;
-                        if (playerHp.Value <= 0)
-                        {
-                            world.CreateEntity().Set<GameOver>();
-                        }
+                        spriteAnimation.AttackFrameEnd = false;
+                        entity.Set<AttackEvent>();
                     }
                     break;
                 case EnemyState.Death:
@@ -776,6 +792,7 @@ public class EnemySpriteAnimationSystem : UpdateSystem
                 animation.CurrentAnimation = 0;
             render.sprite = animation.Frames[animation.CurrentAnimation];
             animator.CurruntFrameTime = 0f;
+            animator.AttackFrameEnd = true;
         }
     }
 }
@@ -802,5 +819,59 @@ public class DeadEnemyLayDownCountDonwSystem : UpdateSystem
             if(deadCountDown.Value <= 0)
                 Servise<EnemySpawner>.Get().BackToPool(view.Value, deadCountDown);
         });
+    }
+}
+[EcsComponent] public class RangeAttackEnemy
+{
+    public MonoEntity Bullet;
+    public Transform FirePoint;
+}
+[EcsComponent] public class MeleeAttackEnemy{}
+[EcsComponent]public class AttackEvent{}
+public class RangeAttackEnemySystem : UpdateSystem
+{
+    public override void Update()
+    {
+        entities.Each((EnemyRef enemy, RangeAttackEnemy rangeAttack, TransformRef transform , AttackEvent evnt) =>
+        {
+            var dir = (enemy.MoveToTargetValue.position - transform.Value.position).normalized;
+            var bullet = Pools.ReuseEntity(rangeAttack.Bullet, rangeAttack.FirePoint.position, Quaternion.identity);
+            bullet.GetRef<Direction>().Value = dir;
+        });
+    }
+}
+
+public class MeleeAttackEnemySystem : UpdateSystem
+{
+    public override void Update()
+    {
+        entities.Each((EnemyRef enemy, MeleeAttackEnemy meleeAttack, AttackEvent evnt, Damage damage) =>
+        {
+            var playerHp = enemy.TargetEntity.Get<Health>();
+            playerHp.Value -= damage.Value;
+            if (playerHp.Value <= 0)
+            {
+                world.CreateEntity().Set<GameOver>();
+            }
+        });
+    }
+}
+
+public class DamagePlayerByEnemyExplosionSystem : UpdateSystem
+{
+    public override void Update()
+    {
+        entities.Without<Dead>().Each((Entity entity, Health Health, Damaged damaged) =>
+        {
+            Debug.Log(damaged.Damage);
+            Health.Value -= damaged.Damage;
+            if (Health.Value <= 0)
+            {
+                world.CreateEntity().Set<GameOver>();
+                entity.Set<Dead>();
+            }
+            entity.Remove<Damaged>();
+        });
+        
     }
 }

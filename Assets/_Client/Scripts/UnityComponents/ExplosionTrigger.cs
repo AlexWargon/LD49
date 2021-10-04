@@ -16,6 +16,12 @@ public class ExplosionTriggerRef
 {
     public ExplosionTrigger Value;
 }
+
+public enum Owner
+{
+    Enemy,
+    Player
+}
 public class ExplosionTrigger : MonoBehaviour
 {
     public bool delayStarted;

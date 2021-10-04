@@ -233,6 +233,7 @@ GameObject:
   - component: {fileID: 3856945881406288972}
   - component: {fileID: 3856945881406288973}
   - component: {fileID: 7167067905711618100}
+  - component: {fileID: 1747911177}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -359,6 +360,20 @@ MonoBehaviour:
       type: {class: TransformRef, ns: , asm: Assembly-CSharp}
       data:
         Value: {fileID: 3856945881406288969}
+--- !u!136 &1747911177
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3856945881406288975}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.75
+  m_Height: 3.38
+  m_Direction: 1
+  m_Center: {x: 0, y: 1.27, z: -1.51}
 --- !u!1 &3889480350460252381
 GameObject:
   m_ObjectHideFlags: 0

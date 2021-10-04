@@ -137,6 +137,7 @@ MonoBehaviour:
   - id: 9
   - id: 10
   - id: 11
+  - id: 12
   runTime: 0
   destroyObject: 0
   destroyComponent: 0
@@ -197,6 +198,8 @@ MonoBehaviour:
       type: {class: View, ns: , asm: Assembly-CSharp}
       data:
         Value: {fileID: 2744982186770112516}
+    0000000C:
+      type: {class: MeleeAttackEnemy, ns: , asm: Assembly-CSharp}
 --- !u!136 &1944518598305511157
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -223,8 +226,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d71f35d329581cc4dba0ea5ab1398e92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AttackFrameEnd: 0
   FrameTime: 0.0625
   CurruntFrameTime: 0
+  AttackFrame: 9
   Run:
     CurrentAnimation: 0
     Frames:

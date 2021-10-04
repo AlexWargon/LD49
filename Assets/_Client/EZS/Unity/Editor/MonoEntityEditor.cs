@@ -162,6 +162,7 @@ namespace Wargon.ezs.Unity {
             var component= NewObject(type);
             entity.Entity.AddBoxed(component);
             entity.Components.Add(component);
+            EditorUtility.SetDirty(entity);
         }
 
         private void DrawComponents() {
