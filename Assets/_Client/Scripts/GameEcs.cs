@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
 using DG.Tweening;
@@ -15,6 +16,7 @@ public class GameEcs : MonoBehaviour
     public GameService GameService;
     private Systems updateSystems;
     public static bool GameReady;
+    
     private void Awake()
     {
 
@@ -67,9 +69,17 @@ public class GameEcs : MonoBehaviour
         new DebugInfo(World);
 #endif
         updateSystems.Init();
-        GameReady = true;
+        StartCoroutine(Delay(1f, () =>
+        {
+            GameReady = true;
+        }));
     }
 
+    private IEnumerator Delay(float delay, Action callback)
+    {
+        yield return new WaitForSeconds(delay);
+        callback?.Invoke();
+    }
     IEnumerator SpawnerDelay()
     {
         yield return new WaitForSeconds(0.1f);
@@ -173,13 +183,25 @@ public class Particle
 {
     public ParticleSystem Value;
 }
+
+[EcsComponent]
+public class AudioRef
+{
+    public AudioSource Value;
+}
 public class PlayParticleOnSpawnSystem : UpdateSystem
 {
     public override void Update()
     {
+        if(!GameEcs.GameReady) return;
         entities.Each((PooledEvent pooled, Particle particle) =>
         {
             particle.Value.Play();
+        });
+        entities.Each((PooledEvent Pooled, AudioRef audio) =>
+        {
+            
+            audio.Value.Play();
         });
         entities.Each((PooledEvent pooled, ExplosionTriggerRef particle) =>
         {

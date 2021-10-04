@@ -310,9 +310,11 @@ public struct EachWithJob<A, B, Executor> : IJobParallelFor
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Clear()
     {
+        #if UNITY_EDITOR
         NativeMagic.UnwrapFromNative(Entites);
         NativeMagic.UnwrapFromNative(ItemsA);
         NativeMagic.UnwrapFromNative(ItemsB);
+        #endif
     }
 }
 

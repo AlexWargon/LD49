@@ -9,11 +9,11 @@ using Random = UnityEngine.Random;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public int SpawnSize;
     public float SpawnTimer;
     public float CurrentSpawnTimer;
     public Transform[] spawnPoint;
     public MonoEntity MeleeEnemy;
+    public MonoEntity RangeEnemy;
     public int PoolSize;
     public float YHeight = 2f;
     private Queue<MonoEntity> EnemyPool = new Queue<MonoEntity>();
@@ -26,7 +26,7 @@ public class EnemySpawner : MonoBehaviour
 
     private IEnumerator Spawn()
     {
-        for(var i = 0; i < SpawnSize; i++)
+        for(var i = 0; i < PoolSize; i++)
         {
             SpawnSingleEnemy();
             yield return null;
@@ -47,9 +47,9 @@ public class EnemySpawner : MonoBehaviour
             
             enemy.gameObject.SetActive(true);
             
-            var x = Random.Range(-20, 20);
-            var z = Random.Range(-20, 20);
-            var spawnpos = new Vector3(spawner.position.x +x, YHeight,spawner.position.z + z);
+            var x = Random.Range(-14, 14);
+            var z = Random.Range(-14, 14);
+            var spawnpos = new Vector3(spawner.position.x + x, spawner.position.y,spawner.position.z + z);
             var transform1 = enemy.transform;
             transform1.position = spawnpos;
             transform1.rotation = Quaternion.identity;
@@ -75,21 +75,40 @@ public class EnemySpawner : MonoBehaviour
         var thisTransform = transform;
         var chunk = 25;
         var spawnVector = new Vector3(thisTransform.position.x, YHeight, thisTransform.position.z);
+        var rangeEnemyEventSpawn = 0;
         for (int i = 0; i < PoolSize; i++)
         {
-            var monoEntity = Instantiate(MeleeEnemy, spawnVector, Quaternion.identity, thisTransform);
-            monoEntity.ConvertToEntity();
-            monoEntity.Get<EnemyRef>().NavMeshAgentVelue.enabled = false;
-            monoEntity.Entity.Set<Dead>();
-            monoEntity.Entity.Set<UnActive>();
-            monoEntity.gameObject.SetActive(false);
-            EnemyPool.Enqueue(monoEntity);
+            if (rangeEnemyEventSpawn == 15)
+            {
+                var monoEntity = Instantiate(RangeEnemy, spawnVector, Quaternion.identity, thisTransform);
+                monoEntity.ConvertToEntity();
+                monoEntity.Get<EnemyRef>().NavMeshAgentVelue.enabled = false;
+                monoEntity.Entity.Set<Dead>();
+                monoEntity.Entity.Set<UnActive>();
+                monoEntity.gameObject.SetActive(false);
+                EnemyPool.Enqueue(monoEntity);
+                rangeEnemyEventSpawn = 0;
+            }
+            else
+            {
+                var monoEntity = Instantiate(MeleeEnemy, spawnVector, Quaternion.identity, thisTransform);
+                monoEntity.ConvertToEntity();
+                monoEntity.Get<EnemyRef>().NavMeshAgentVelue.enabled = false;
+                monoEntity.Entity.Set<Dead>();
+                monoEntity.Entity.Set<UnActive>();
+                monoEntity.gameObject.SetActive(false);
+                EnemyPool.Enqueue(monoEntity);
+            }
+
             chunk--;
+            
             if (chunk == 0)
             {
                 chunk = 25;
                 yield return null;
             }
+
+            rangeEnemyEventSpawn++;
         }
 
     }
