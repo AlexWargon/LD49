@@ -166,7 +166,7 @@ public class Pools : MonoBehaviour
             return ReuseEntityNonStatic(prefab, position, rotation);
         }
 
-        CreateEntityPool(prefab, 32);
+        CreateEntityPool(prefab, 128);
         return ReuseEntityNonStatic(prefab, position, rotation);
     }
     
@@ -195,7 +195,7 @@ public class Pools : MonoBehaviour
             return ReuseEntityNonStatic(prefab, position, rotation, parent);
         }
 
-        CreateEntityPoolNonStatic(prefab, 32, parent);
+        CreateEntityPoolNonStatic(prefab, 128, parent);
         return ReuseEntityNonStatic(prefab, position, rotation, parent);
     }
     

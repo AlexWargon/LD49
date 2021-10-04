@@ -35,6 +35,9 @@ public static class EcsExtensions
         EachWithJob<A, B, AExecutor> job = default;
         job.Set(entities, entityType.poolA.items, entityType.poolB.items, ref jobExecute);
         job.Schedule(entityType.Count, 0).Complete();
+#if UNITY_EDITOR
+        job.Clear();
+#endif
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -303,6 +306,13 @@ public struct EachWithJob<A, B, Executor> : IJobParallelFor
         executionFunc.ForEach(ref itemA, ref itemB);
         ItemsA.Array[entity] = itemA;
         ItemsB.Array[entity] = itemB;
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Clear()
+    {
+        NativeMagic.UnwrapFromNative(Entites);
+        NativeMagic.UnwrapFromNative(ItemsA);
+        NativeMagic.UnwrapFromNative(ItemsB);
     }
 }
 

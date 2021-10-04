@@ -146,6 +146,9 @@ public class SyncTransformSystem : UpdateSystem
             job.transformComponents = data;
             job.entities = NativeMagic.WrapToNative(entities);
             job.Schedule(transformAccessArray).Complete();
+#if UNITY_EDITOR
+            job.Clear();
+#endif
         }
 
         internal override void Clear()
@@ -153,11 +156,12 @@ public class SyncTransformSystem : UpdateSystem
             disposed = true;
             #if UNITY_EDITOR
             job.Clear();
-            #endif
             transformAccessArray.Dispose();
+            #endif
+            
         }
 
-        [BurstCompile(CompileSynchronously = true)]
+        [BurstCompile]
         struct TransformSynchronizeJob : IJobParallelForTransform
         {
             public NativeWrappedData<TransformComponent> transformComponents;
