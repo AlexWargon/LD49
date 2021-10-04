@@ -43,10 +43,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a01330345354d9b47bf179994f994db5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpawnSize: 100
-  SpawnTimer: 5
-  CurrentSpawnTimer: 5
-  spawnPoint: []
+  SpawnTimer: 2
+  CurrentSpawnTimer: 2
+  spawnPoint:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   MeleeEnemy: {fileID: 2744982186770112516, guid: f777e6c49fb92dd4385104ad3f305b44,
     type: 3}
+  RangeEnemy: {fileID: 6010544723229177743, guid: 6a9742c0dfbb84e48954c6bf26455681,
+    type: 3}
   PoolSize: 3000
+  YHeight: 2
