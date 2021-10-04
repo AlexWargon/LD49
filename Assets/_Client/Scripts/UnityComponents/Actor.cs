@@ -83,7 +83,7 @@ public class Actor : MonoBehaviour
         m_SlideLimit = m_Controller.slopeLimit - .1f;
         m_JumpTimer = m_AntiBunnyHopFactor;
 
-        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.lockState = CursorLockMode.None;
         Cursor.lockState = CursorLockMode.Confined;
     }
 
