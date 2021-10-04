@@ -20,6 +20,11 @@ public class LoadNextScene : MonoBehaviour
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 
+    public void LoadGameScene()
+    {
+        SceneManager.LoadScene(1, LoadSceneMode.Single);
+    }
+
     public void CloseGame()
     {
         Application.Quit();
