@@ -15,6 +15,7 @@ public class EnemySpawner : MonoBehaviour
     public Transform[] spawnPoint;
     public MonoEntity MeleeEnemy;
     public int PoolSize;
+    public float YHeight = 2f;
     private Queue<MonoEntity> EnemyPool = new Queue<MonoEntity>();
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -41,16 +42,18 @@ public class EnemySpawner : MonoBehaviour
             var enemy = EnemyPool.Dequeue();
             enemy.Entity.Remove<Dead>();
             enemy.Entity.Remove<UnActive>();
+            enemy.Entity.Remove<DeathState>();
             enemy.Entity.Add(new EnemySpawnEvent());
             
             enemy.gameObject.SetActive(true);
-            enemy.Get<EnemyRef>().NavMeshAgentVelue.enabled = true;
+            
             var x = Random.Range(-20, 20);
             var z = Random.Range(-20, 20);
-            var spawnpos = new Vector3(spawner.position.x +x, 4f,spawner.position.z + z);
+            var spawnpos = new Vector3(spawner.position.x +x, YHeight,spawner.position.z + z);
             var transform1 = enemy.transform;
             transform1.position = spawnpos;
             transform1.rotation = Quaternion.identity;
+            enemy.Get<EnemyRef>().NavMeshAgentVelue.enabled = true;
         }
     }
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -71,9 +74,10 @@ public class EnemySpawner : MonoBehaviour
     {
         var thisTransform = transform;
         var chunk = 25;
+        var spawnVector = new Vector3(thisTransform.position.x, YHeight, thisTransform.position.z);
         for (int i = 0; i < PoolSize; i++)
         {
-            var monoEntity = Instantiate(MeleeEnemy, transform.position, Quaternion.identity, thisTransform);
+            var monoEntity = Instantiate(MeleeEnemy, spawnVector, Quaternion.identity, thisTransform);
             monoEntity.ConvertToEntity();
             monoEntity.Get<EnemyRef>().NavMeshAgentVelue.enabled = false;
             monoEntity.Entity.Set<Dead>();

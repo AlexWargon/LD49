@@ -217,6 +217,27 @@
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Each<A, B, C, D>(LambdaCCCCR<Entity,A, B, C, D> action)
+        {
+            var entityType = GetEntityType<A, B, C, D>();
+            if(entityType.Count < 1) return;
+            var entities = entityType.entities;
+            var a = entityType.poolA.items;
+            var b = entityType.poolB.items;
+            var c = entityType.poolС.items;
+            var d = entityType.poolD.items;
+            for (var index = 0; index < entityType.Count; index++)
+            {
+                var entity = entities[index];
+                action( 
+                    world.GetEntity(entity),
+                    a[entity],
+                    b[entity],
+                    c[entity],
+                    ref d[entity]);
+            }
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Each<A, B, C, D>(Lambda<A, B, C, D> action)
         {
             var entityType = GetEntityType<A, B, C, D>();

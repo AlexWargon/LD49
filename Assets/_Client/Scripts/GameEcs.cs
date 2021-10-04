@@ -20,7 +20,7 @@ public class GameEcs : MonoBehaviour
 
         World = new World();
         MonoConverter.Init(World);
-        Servise<GameService>.Set(new GameService());
+
         Servise<EnemySpawner>.Set(EnemySpawner);
         Servise<GameService>.Set(GameService);
         StartCoroutine(SpawnerDelay());
@@ -38,7 +38,7 @@ public class GameEcs : MonoBehaviour
                 .Add(new ComboSystem())
                 .Add(new EnemyAISystem())
                 .Add(new EnemySpriteAnimationSystem())
-                .Add(new EnemyAttakStateSystem())
+                //.Add(new EnemyAttakStateSystem())
                 .Add(new EnemyMoveSystem())
                 .Add(new DeadEnemyLayDownCountDonwSystem())
                 
@@ -87,12 +87,12 @@ public class ComboSystem : UpdateSystem
     private float comboDelay;
     public override void Update()
     {
-        comboDelay += Time.deltaTime;
-        if (comboDelay > 1f)
-        {
-            comboDelay = 0;
-            Servise<GameService>.Get().Combo = 0;
-        }
+        // comboDelay += Time.deltaTime;
+        // if (comboDelay > 1f)
+        // {
+        //     comboDelay = 0;
+        //     Servise<GameService>.Get().Combo = 0;
+        // }
     }
 }
 public class OnPlayerSpawnSystem : UpdateSystem
@@ -462,7 +462,7 @@ public class BurstFlyEnemySystem : UpdateSystem
         j0b.deadpos = DEAD_Y_POS;
         j0b.dt = Time.deltaTime;
         entities.EachWithJob<FlyEnemyJob, FlyWithBurst, TransformComponent>(ref j0b);
-        entities.Each((Entity entity, TransformRef transform, ColliderRef Collider, ref FlyWithBurst fly) =>
+        entities.Each((Entity entity, TransformRef transform, ColliderRef Collider, DeathState deathState, ref FlyWithBurst fly) =>
         {
             if (fly.Grounded)
             {
@@ -498,6 +498,7 @@ public class BurstFlyEnemySystem : UpdateSystem
         }
     }
 }
+[EcsComponent] public class DeathState{}
 public class PostExplosionCollisionEnemySystem : UpdateSystem
 {
     private const float ROTATION_SPEED = 5500f;
@@ -515,7 +516,7 @@ public class PostExplosionCollisionEnemySystem : UpdateSystem
             
             gameService.Combo++;
             comboShowDelay = 0f;
-
+            enemy.State = EnemyState.Death;
             ui.AddKills();
             enemy.NavMeshAgentVelue.enabled = false;
             var dir = (transformRef.Value.position - damaged.From).normalized;
@@ -533,18 +534,36 @@ public class PostExplosionCollisionEnemySystem : UpdateSystem
                 MaxY =  Random.Range(5,15),
                 SpeedRotation =  rSpeed
             };
+            
             ref var transform = ref entity.GetRef<TransformComponent>();
             transform.position = transformRef.Value.position;
             transform.rotation = transformRef.Value.rotation;
             entity.Remove<NoBurst>();
+            entity.Remove<RunState>();
+            entity.Remove<AttackState>();
+            entity.Set<DeathState>();
+
             entity.Add(flyForce);
         });
+        TryShowCombo(gameService, ui);
+    }
+
+    private void TryShowCombo(GameService gameService, UIController ui)
+    {
         if (gameService.Combo > MINIMUM_COMBO_SIZE && comboShowDelay > COMBO_SHOW_DELAY)
         {
             Debug.Log($"xxx COMBO xxx {gameService.Combo} xxx COMBO xxx");
             ui.ShowCombo(gameService.Combo);
-            comboShowDelay = 0;
+            gameService.Combo = 0;
         }
+    }
+
+    private bool startComboDelay;
+    private void ShowCombo(GameService gameService, UIController ui)
+    {
+        Debug.Log($"xxx COMBO xxx {gameService.Combo} xxx COMBO xxx");
+        ui.ShowCombo(gameService.Combo);
+        gameService.Combo = 0;
     }
 }
 
@@ -589,10 +608,10 @@ public class EnemyMoveSystem : UpdateSystem
             delay += dt;
             if (delay > 1f)
             {
-                enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
+                if(enemyRef.NavMeshAgentVelue.isOnNavMesh)
+                    enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
                 delay = 0f;
             }
-
         });
     }
 }
@@ -615,7 +634,7 @@ public class EnemyAISystem : UpdateSystem
     private const float LOW_AGENT_DISTANCE = 50f;
     public override void Update()
     {
-        entities.Without<Dead>().Each((Entity entity, EnemyRef enemy, TransformRef TransformRef) =>
+        entities.Without<Dead,DeathState>().Each((Entity entity, EnemyRef enemy, TransformRef TransformRef) =>
         {
             var transform = TransformRef.Value;
             var distance = Vector3.Distance(transform.position, enemy.MoveToTargetValue.position);
@@ -710,28 +729,42 @@ public class EnemySpriteAnimationSystem : UpdateSystem
     public override void Update()
     {
         var dt = Time.deltaTime;
-        entities.Without<Dead>().Each((EnemyRef EnemyRef, SpriteAnim animation, SpriteRender render) =>
+        entities.Without<Dead>().Each((Entity entity, EnemyRef enemy, SpriteAnim animation, SpriteRender render, Damage damage) =>
         {
             var spriteRenderer = render.Value;
             var spriteAnimation = animation.Value;
-            switch (EnemyRef.State)
+            switch (enemy.State)
             {
                 case EnemyState.Run:
                     PlayAnimation(ref spriteAnimation.Run, animation.Value, spriteRenderer,dt);
                     break;
-                // case EnemyState.Attack:
-                //     PlayAnimation(ref spriteAnimation.Attack, animation.Value, spriteRenderer,dt);
-                //     break;
-                // case EnemyState.Death:
-                //     PlayAnimation(ref spriteAnimation.Death, animation.Value, spriteRenderer,dt);
-                //     break;
-                // case EnemyState.Dead:
-                //     break;
+                case EnemyState.Attack:
+                    PlayAnimation(ref spriteAnimation.Attack, animation.Value, spriteRenderer,dt);
+                    if (spriteAnimation.Attack.CurrentAnimation == 9)
+                    {
+                        var playerHp = enemy.TargetEntity.Get<Health>();
+                        playerHp.Value -= damage.Value;
+                        if (playerHp.Value <= 0)
+                        {
+                            world.CreateEntity().Set<GameOver>();
+                        }
+                    }
+                    break;
+                case EnemyState.Death:
+                    SetDeadSprite(ref spriteAnimation.Death, spriteRenderer);
+                    break;
+                case EnemyState.Dead:
+                    
+                     break;
 
             }
         });
     }
-
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void SetDeadSprite(ref Animation animation, SpriteRenderer render)
+    {
+        render.sprite = animation.Frames[0];
+    }
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void PlayAnimation(ref Animation animation, SpriteAnimation animator, SpriteRenderer render, float dt)
     {

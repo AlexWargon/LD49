@@ -5720,26 +5720,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3565303159213233211, guid: a0306a0ab5cc64f468d766f0c60bf580,
-        type: 3}
-      propertyPath: m_RendererIndex
-      value: -1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3565303159213233211, guid: a0306a0ab5cc64f468d766f0c60bf580,
-        type: 3}
-      propertyPath: m_RenderPostProcessing
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3856945881195804611, guid: a0306a0ab5cc64f468d766f0c60bf580,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3856945881195804611, guid: a0306a0ab5cc64f468d766f0c60bf580,
-        type: 3}
-      propertyPath: m_ClearFlags
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3856945881406288969, guid: a0306a0ab5cc64f468d766f0c60bf580,
         type: 3}
       propertyPath: m_RootOrder
@@ -5799,16 +5779,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 3856945881406288975, guid: a0306a0ab5cc64f468d766f0c60bf580,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7167067905711618100, guid: a0306a0ab5cc64f468d766f0c60bf580,
-        type: 3}
-      propertyPath: Components.Array.data[3].Value
-      value: 1000
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a0306a0ab5cc64f468d766f0c60bf580, type: 3}
