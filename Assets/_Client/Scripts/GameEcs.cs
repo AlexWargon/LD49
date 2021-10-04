@@ -2,6 +2,7 @@ using System.Collections;
 using System.Runtime.CompilerServices;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.AI;
 using Wargon.ezs;
 using Wargon.ezs.Unity;
 using Random = UnityEngine.Random;
@@ -11,7 +12,9 @@ public class GameEcs : MonoBehaviour
     public EnemySpawner EnemySpawner;
     public static World World;
     public UIController UiController;
+    public GameService GameService;
     private Systems updateSystems;
+    public static bool GameReady;
     private void Awake()
     {
 
@@ -19,6 +22,7 @@ public class GameEcs : MonoBehaviour
         MonoConverter.Init(World);
         Servise<GameService>.Set(new GameService());
         Servise<EnemySpawner>.Set(EnemySpawner);
+        Servise<GameService>.Set(GameService);
         StartCoroutine(SpawnerDelay());
         
         updateSystems = new Systems(World)
@@ -31,20 +35,24 @@ public class GameEcs : MonoBehaviour
                 .Add(new OnPlayerSpawnSystem())
                 .Add(new OnEnemySpawnSystem())
                 //.Add(new ExplosionCollisionSystem())
-                
+                .Add(new ComboSystem())
                 .Add(new EnemyAISystem())
                 .Add(new EnemySpriteAnimationSystem())
-                
                 .Add(new EnemyAttakStateSystem())
+                .Add(new EnemyMoveSystem())
                 .Add(new DeadEnemyLayDownCountDonwSystem())
+                
                 .Add(new GameOverSystem())
+                
                 
                 .Add(new PostExplosionCollisionEnemySystem())
                 .Add(new PostExplosionCollisionRocksSystem())
+                
                 .Add(new BurstFlyEnemySystem())
+                
                 .Add(new LifeTimeSystem())
                 .Add(new PlayParticleOnSpawnSystem())
-                .Add(new EnemyMoveSystem())
+                
                 .Add(new OnBulletBackToPoolExplosionSystem())
                 .Add(new ClearEventsSystem())
 
@@ -55,6 +63,7 @@ public class GameEcs : MonoBehaviour
         new DebugInfo(World);
 #endif
         updateSystems.Init();
+        GameReady = true;
     }
 
     IEnumerator SpawnerDelay()
@@ -73,10 +82,18 @@ public class GameEcs : MonoBehaviour
 }
 [EcsComponent] public struct SpawnedEvent{}
 
-public class GameService
+public class ComboSystem : UpdateSystem
 {
-    public Entity PlayerEntity;
-    public Transform PlayerTrasform;
+    private float comboDelay;
+    public override void Update()
+    {
+        comboDelay += Time.deltaTime;
+        if (comboDelay > 1f)
+        {
+            comboDelay = 0;
+            Servise<GameService>.Get().Combo = 0;
+        }
+    }
 }
 public class OnPlayerSpawnSystem : UpdateSystem
 {
@@ -484,15 +501,25 @@ public class BurstFlyEnemySystem : UpdateSystem
 public class PostExplosionCollisionEnemySystem : UpdateSystem
 {
     private const float ROTATION_SPEED = 5500f;
+    private const int MINIMUM_COMBO_SIZE = 50;
+    private const float COMBO_SHOW_DELAY = 0.2f;
+    private float comboShowDelay = 0;
     public override void Update()
     {
-        entities.Without<RookRef>().Each((Entity entity, DamagedByExplosion damaged, TransformRef transformRef, CanTakeDamageByExplosion tag, EnemyRef enemy, NoBurst noBurst) =>
+        var dt = Time.deltaTime;
+        comboShowDelay += dt;
+        var gameService = Servise<GameService>.Get();
+        var ui = Servise<UIController>.Get();
+        entities.Without<RookRef,Dead>().Each((Entity entity, DamagedByExplosion damaged, TransformRef transformRef, CanTakeDamageByExplosion tag, EnemyRef enemy, NoBurst noBurst) =>
         {
+            
+            gameService.Combo++;
+            comboShowDelay = 0f;
+
+            ui.AddKills();
             enemy.NavMeshAgentVelue.enabled = false;
-            //var force = (transformRef.Value.position - damaged.From).normalized * damaged.Power; 
-            //rb.Value.AddForce(force, ForceMode.Impulse);
             var dir = (transformRef.Value.position - damaged.From).normalized;
-            if (dir.y < 0)
+            if (dir.y < 0.1f)
                 dir.y = Random.Range(0.4f, 1f);
             float rSpeed;
             if (dir.x > 0)
@@ -512,6 +539,12 @@ public class PostExplosionCollisionEnemySystem : UpdateSystem
             entity.Remove<NoBurst>();
             entity.Add(flyForce);
         });
+        if (gameService.Combo > MINIMUM_COMBO_SIZE && comboShowDelay > COMBO_SHOW_DELAY)
+        {
+            Debug.Log($"xxx COMBO xxx {gameService.Combo} xxx COMBO xxx");
+            ui.ShowCombo(gameService.Combo);
+            comboShowDelay = 0;
+        }
     }
 }
 
@@ -547,11 +580,19 @@ public class PostExplosionCollisionRocksSystem : UpdateSystem
 
 public class EnemyMoveSystem : UpdateSystem
 {
+    private float delay;
     public override void Update()
     {
+        var dt = Time.deltaTime;
         entities.Without<Dead>().Each((EnemyRef enemyRef, RunState runState, ref NoBurst tag) =>
         {
-            enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
+            delay += dt;
+            if (delay > 1f)
+            {
+                enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
+                delay = 0f;
+            }
+
         });
     }
 }
@@ -571,12 +612,19 @@ public class SpriteRender
 [EcsComponent] public class RunState{}
 public class EnemyAISystem : UpdateSystem
 {
+    private const float LOW_AGENT_DISTANCE = 50f;
     public override void Update()
     {
         entities.Without<Dead>().Each((Entity entity, EnemyRef enemy, TransformRef TransformRef) =>
         {
             var transform = TransformRef.Value;
             var distance = Vector3.Distance(transform.position, enemy.MoveToTargetValue.position);
+            
+            if (distance > LOW_AGENT_DISTANCE)
+                enemy.NavMeshAgentVelue.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
+            else
+                enemy.NavMeshAgentVelue.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
+            
             if (distance <= enemy.AttackRange)
             {
                 enemy.State = EnemyState.Attack;

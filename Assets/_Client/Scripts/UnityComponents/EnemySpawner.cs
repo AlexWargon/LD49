@@ -69,10 +69,11 @@ public class EnemySpawner : MonoBehaviour
 
     private IEnumerator InitPools()
     {
+        var thisTransform = transform;
         var chunk = 25;
         for (int i = 0; i < PoolSize; i++)
         {
-            var monoEntity = Instantiate(MeleeEnemy, transform.position, Quaternion.identity);
+            var monoEntity = Instantiate(MeleeEnemy, transform.position, Quaternion.identity, thisTransform);
             monoEntity.ConvertToEntity();
             monoEntity.Get<EnemyRef>().NavMeshAgentVelue.enabled = false;
             monoEntity.Entity.Set<Dead>();

@@ -37,7 +37,7 @@ public class ExplosionTrigger : MonoBehaviour
             
         if (mono.Entity.Has<CanTakeDamageByExplosion>())
         {
-            Debug.Log(other.name);
+            //Debug.Log(other.name);
             mono.Entity.Add(new DamagedByExplosion
             {
                 Power = entity.Entity.Get<ExplosionPower>().Value,
@@ -48,7 +48,7 @@ public class ExplosionTrigger : MonoBehaviour
 
     private IEnumerator TriggerDelay()
     {
-        yield return new WaitForSeconds(0.1f);
+        yield return null;
         triggered = true;
     }
 }

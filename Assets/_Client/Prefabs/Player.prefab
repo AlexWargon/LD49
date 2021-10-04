@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6908696805534238386}
   - component: {fileID: 3985818770635387991}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Weapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -99,7 +99,7 @@ GameObject:
   - component: {fileID: 3856945881195804612}
   - component: {fileID: 3856945881195804613}
   - component: {fileID: 3565303159213233211}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -233,7 +233,7 @@ GameObject:
   - component: {fileID: 3856945881406288972}
   - component: {fileID: 3856945881406288973}
   - component: {fileID: 7167067905711618100}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -354,7 +354,7 @@ MonoBehaviour:
     00000003:
       type: {class: Health, ns: , asm: Assembly-CSharp}
       data:
-        Value: 200
+        Value: 1000
     00000004:
       type: {class: TransformRef, ns: , asm: Assembly-CSharp}
       data:
@@ -368,7 +368,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3952522560859657534}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: End
   m_TagString: Untagged
   m_Icon: {fileID: 7422848464349959988, guid: 0000000000000000d000000000000000, type: 0}
@@ -398,7 +398,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 865344245385152292}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Start
   m_TagString: Untagged
   m_Icon: {fileID: 7422848464349959988, guid: 0000000000000000d000000000000000, type: 0}
@@ -432,7 +432,7 @@ GameObject:
   - component: {fileID: 4821154354293344839}
   - component: {fileID: 9046843144387468142}
   - component: {fileID: 6124224050232204345}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -527,7 +527,7 @@ GameObject:
   - component: {fileID: 2473906773213690003}
   - component: {fileID: 1052873393}
   - component: {fileID: 7721345253689565461}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Hand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
