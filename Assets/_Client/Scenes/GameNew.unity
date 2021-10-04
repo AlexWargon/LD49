@@ -3964,6 +3964,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6454545961378928561, guid: c8392a1131603dc4c81941ed543cfafb,
         type: 3}
+      propertyPath: RangeEnemy
+      value: 
+      objectReference: {fileID: 6010544723229177743, guid: 6a9742c0dfbb84e48954c6bf26455681,
+        type: 3}
+    - target: {fileID: 6454545961378928561, guid: c8392a1131603dc4c81941ed543cfafb,
+        type: 3}
       propertyPath: SpawnTimer
       value: 2
       objectReference: {fileID: 0}
@@ -6611,11 +6617,11 @@ Transform:
   - {fileID: 1541868834}
   - {fileID: 1040286810}
   - {fileID: 1257002884}
+  - {fileID: 2015262338}
   - {fileID: 878362224}
   - {fileID: 428270610}
   - {fileID: 889024501}
   - {fileID: 642207491}
-  - {fileID: 2015262338}
   - {fileID: 1579413484}
   - {fileID: 1429302316}
   - {fileID: 1364034819}
@@ -10067,7 +10073,7 @@ Transform:
   - {fileID: 1294491385}
   - {fileID: 1845400369}
   m_Father: {fileID: 1300001960}
-  m_RootOrder: 39
+  m_RootOrder: 35
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &2039904817 stripped
 Transform:
