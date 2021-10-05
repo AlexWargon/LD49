@@ -22,10 +22,10 @@ public class SyncTransformSystem : UpdateSystem
                 ComponentType<TransformComponent>.ID,
                 ComponentType<TransformRef>.ID
             };
-            ExludeCount = 2;
+            ExludeCount = 1;
             ExcludeTypes = new[] {
-                ComponentType<UnActive>.ID,
-                ComponentType<NoBurst>.ID
+                ComponentType<UnActive>.ID//,
+                //ComponentType<NoBurst>.ID
             };
             structComponents = world.GetPool<TransformComponent>();
             classComponents = world.GetPool<TransformRef>();
@@ -38,9 +38,9 @@ public class SyncTransformSystem : UpdateSystem
             var PoolEx = world.GetPool<UnActive>();
             PoolEx.OnAdd += OnAddExclude;
             PoolEx.OnRemove += OnRemoveExclude;
-            var PoolEx2 = world.GetPool<NoBurst>();
-            PoolEx2.OnAdd += OnAddExclude;
-            PoolEx2.OnRemove += OnRemoveExclude;
+            // var PoolEx2 = world.GetPool<NoBurst>();
+            // PoolEx2.OnAdd += OnAddExclude;
+            // PoolEx2.OnRemove += OnRemoveExclude;
             world.OnCreateEntityType(this);
         }
 
@@ -153,10 +153,11 @@ public class SyncTransformSystem : UpdateSystem
 
         internal override void Clear()
         {
-            disposed = true;
+            
             #if UNITY_EDITOR
-            job.Clear();
+            Debug.Log("TRANSFORMS DISPOSED");
             transformAccessArray.Dispose();
+            disposed = true;
             #endif
             
         }
@@ -172,10 +173,10 @@ public class SyncTransformSystem : UpdateSystem
                 
                 var transformComponent = transformComponents.Array[entity];
                 transformComponent.right = transformComponent.rotation * Vector3.right;
+                transformComponent.forward = transformComponent.rotation * Vector3.forward;
                 transform.position = transformComponent.position;
                 transform.rotation = transformComponent.rotation;
                 transform.localScale = transformComponent.scale;
-                
                 transformComponents.Array[entity] = transformComponent;
             }
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -193,7 +194,7 @@ public class SyncTransformSystem : UpdateSystem
     {
         base.Init(entities, world);
         transforms = new Transforms(world);
-        entities.Without<UnActive,NoBurst>().EntityTypes.Add( typeof(Transforms), transforms);
+        entities.Without<UnActive>().EntityTypes.Add( typeof(Transforms), transforms);
     }
 
     public override void Update()

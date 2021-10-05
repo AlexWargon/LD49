@@ -117,6 +117,30 @@ namespace Wargon.ezs
                 }
             }
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void Each<A, B, C, D, E, F>(LambdaCCCCCR<A, B, C, D, E, F> action)
+            {
+                var entityType = GetEntityTypeWithout<A, B, C, D, E, F>();
+                if(entityType.Count < 1) return;
+                var entities = entityType.entities;
+                var a = entityType.poolA.items;
+                var b = entityType.poolB.items;
+                var c = entityType.poolС.items;
+                var d = entityType.poolD.items;
+                var e = entityType.poolE.items;
+                var f = entityType.poolF.items;
+                for (var index = 0; index < entityType.Count; index++)
+                {
+                    var entity = entities[index];
+                    action( 
+                        a[entity],
+                        b[entity],
+                        c[entity],
+                        d[entity],
+                        e[entity],
+                        ref f[entity]);
+                }
+            }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Each<A, B, C, D, E>(LambdaCCCRR<A, B, C, D, E> action)
             {
                 var entityType = GetEntityTypeWithout<A, B, C, D, E>();

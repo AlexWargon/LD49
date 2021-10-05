@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
 using DG.Tweening;
+using Unity.Burst;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
 using Wargon.ezs;
@@ -28,24 +30,30 @@ public class GameEcs : MonoBehaviour
         StartCoroutine(SpawnerDelay());
         
         updateSystems = new Systems(World)
-
+                .Add(new OnPlayerSpawnSystem())
                 .Add(new PlayerInpuntSystem())
                 .Add(new PlayerAttackSystem())
                 .Add(new WeaponSwaySystem())
                 .Add(new ProjectileMoveSystem())
                 .Add(new EnemyBulletsCollision())
                 .Add(new EnergyBallCollisionSystem())
-                .Add(new OnPlayerSpawnSystem())
+                
                 .Add(new OnEnemySpawnSystem())
                 //.Add(new ExplosionCollisionSystem())
                 .Add(new ComboSystem())
                 .Add(new EnemyAISystem())
+
+                
                 .Add(new EnemySpriteAnimationSystem())
                 .Add(new MeleeAttackEnemySystem())
                 .Add(new RangeAttackEnemySystem())
                 .Add(new DamagePlayerByEnemyExplosionSystem())
                 //.Add(new EnemyAttakStateSystem())
+                
+                
                 .Add(new EnemyMoveSystem())
+                .Add(new BurstEnemySpriteRotationSystem())
+                .Add(new BurstEnemyMoveSystem())
                 .Add(new DeadEnemyLayDownCountDonwSystem())
                 
                 .Add(new GameOverSystem())
@@ -54,7 +62,7 @@ public class GameEcs : MonoBehaviour
                 .Add(new PostExplosionCollisionEnemySystem())
                 .Add(new PostExplosionCollisionRocksSystem())
                 
-                .Add(new BurstFlyEnemySystem())
+                .Add(new BurstFlyDeadEnemySystem())
                 
                 .Add(new LifeTimeSystem())
                 .Add(new PlayParticleOnSpawnSystem())
@@ -92,7 +100,16 @@ public class GameEcs : MonoBehaviour
             updateSystems.OnUpdate();
         }
     }
-    
+
+    private void OnDestroy()
+    {
+        if (updateSystems != null)
+        {
+            updateSystems = null;
+            World.Destroy();
+
+        }
+    }
 }
 [EcsComponent] public struct SpawnedEvent{}
 
@@ -148,6 +165,7 @@ public class OnEnemySpawnSystem : UpdateSystem
             anim.Value.Run.CurrentAnimation = Random.Range(0, anim.Value.Run.Frames.Length - 1);
             enemyRef.TargetEntity = Servise<GameService>.Get().PlayerEntity;
             enemyRef.MoveToTargetValue = Servise<GameService>.Get().PlayerTrasform;
+            enemyRef.NavMeshAgentVelue.enabled = true;
         });
     }
 }
@@ -455,20 +473,7 @@ public class ExplosionCollisionSystem : UpdateSystem
                     });
                 }
             }
-            // if (!Physics.SphereCast(sphereCast.Ray.origin, sphereCast.Radius, transform.Value.forward, out sphereCast.Hit)) return;
-            // Debug.Log("123123");
-            // var mono = sphereCast.Hit.collider.GetComponent<MonoEntity>();
-            // if (!mono) return;
-            //
-            // if (mono.Entity.Has<CanTakeDamageByExplosion>())
-            // {
-            //     Debug.Log("SSS");
-            //     mono.Entity.Add(new DamagedByExplosion
-            //     {
-            //         Power = power.Value,
-            //         From = transform.Value.position
-            //     });
-            // }
+
         });
     }
 }
@@ -481,17 +486,57 @@ public struct FlyWithBurst
     public float Force;
     public bool Grounded;
     public float SpeedRotation;
-    public float MaxY;
+    public float MaxTime;
 }
 [EcsComponent] public struct ColliderRef
 {
     public Collider Value;
 }
-[EcsComponent] public class Dead{}
-public class BurstFlyEnemySystem : UpdateSystem
+
+[EcsComponent]
+public struct EnemySprite
+{
+    public Vector3 Dir;
+    public Vector3 Euler;
+}
+
+public class BurstEnemySpriteRotationSystem : UpdateSystem
+{
+    private Job j0b;
+    public override void Update()
+    {
+
+        j0b.dt = Time.deltaTime;
+        j0b.playerPosition = Servise<GameService>.Get().PlayerCaneraTransform.position;
+        j0b.playerPosition.y = 2.505f;
+        entities.Without<Dead,DeathState>().EachWithJob<Job,EnemySprite,TransformComponent,CanRotate,           
+            Dead,DeathState>(ref j0b);
+    }
+
+    struct Job : IJobExecute<EnemySprite, TransformComponent, CanRotate>
+    {
+        public float dt;
+        public Vector3 playerPosition;
+        public void ForEach(ref EnemySprite sprite, ref TransformComponent transformComponent, ref CanRotate r)
+        {
+            // sprite.Dir = (playerPosition - transformComponent.position).normalized;
+            // var rot = Quaternion.Euler(sprite.Dir);
+            // sprite.Euler = rot.eulerAngles;
+            // transformComponent.rotation = rot;
+            //
+
+            sprite.Dir = playerPosition - transformComponent.position;
+            transformComponent.rotation = Quaternion.LookRotation(sprite.Dir);
+        }
+    }
+}
+[EcsComponent] public struct CanRun{}
+[EcsComponent] public struct CanRotate{}
+[EcsComponent] public struct Dead{}
+public class BurstFlyDeadEnemySystem : UpdateSystem
 {
     private FlyEnemyJob j0b;
-    private const float DEAD_Y_POS = 0.4f;
+    private const float DEAD_Y_POS = 0.2f;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private Quaternion DeadRotation()
@@ -502,16 +547,17 @@ public class BurstFlyEnemySystem : UpdateSystem
     {
         j0b.deadpos = DEAD_Y_POS;
         j0b.dt = Time.deltaTime;
-        entities.EachWithJob<FlyEnemyJob, FlyWithBurst, TransformComponent>(ref j0b);
-        entities.Each((Entity entity, TransformRef transform, ColliderRef Collider, DeathState deathState, ref FlyWithBurst fly) =>
+        entities.Without<CanRotate,CanRun>().EachWithJob<FlyEnemyJob, FlyWithBurst, TransformComponent, CanRotate,CanRun>(ref j0b);
+        
+        entities.Each((Entity entity, ColliderRef Collider, DeathState deathState, ref FlyWithBurst fly, ref TransformComponent transform) =>
         {
             if (fly.Grounded)
             {
+                transform.rotation = DeadRotation();
+                Collider.Value.enabled = false;
                 entity.Set<Dead>();
                 entity.Set<NoBurst>();
                 entity.Remove<FlyWithBurst>();
-                transform.Value.rotation = DeadRotation();
-                Collider.Value.enabled = false;
             }
         });
     }
@@ -519,21 +565,23 @@ public class BurstFlyEnemySystem : UpdateSystem
     {
         public float deadpos;
         public float dt;
+        private Vector3 rot;
         public void ForEach(ref FlyWithBurst fly, ref TransformComponent transform)
         {
+            fly.MaxTime -=dt;
             if (!fly.Grounded)
             {
                 transform.position += fly.Direction * fly.Force * dt;
                 fly.Delay += dt;
                 fly.Direction.y -= dt * 0.5f;
-                var rot = transform.rotation.eulerAngles;
+                rot = transform.rotation.eulerAngles;
                 rot.z += fly.SpeedRotation * dt;
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, rot.z), 0.1f);
             }
 
-            if (fly.Delay > 1)
+            if (fly.Delay > 1 )
             {
-                if (transform.position.y < deadpos)
+                if (transform.position.y <= deadpos || fly.MaxTime < 0)
                     fly.Grounded = true;
             }
         }
@@ -572,7 +620,7 @@ public class PostExplosionCollisionEnemySystem : UpdateSystem
             {
                 Direction = dir,
                 Force = damaged.Power,
-                MaxY =  Random.Range(5,15),
+                MaxTime =  10f,
                 SpeedRotation =  rSpeed
             };
             
@@ -582,6 +630,8 @@ public class PostExplosionCollisionEnemySystem : UpdateSystem
             entity.Remove<NoBurst>();
             entity.Remove<RunState>();
             entity.Remove<AttackState>();
+            entity.Remove<CanRotate>();
+            entity.Remove<CanRun>();
             entity.Set<DeathState>();
 
             entity.Add(flyForce);
@@ -600,12 +650,7 @@ public class PostExplosionCollisionEnemySystem : UpdateSystem
     }
 
     private bool startComboDelay;
-    private void ShowCombo(GameService gameService, UIController ui)
-    {
-        Debug.Log($"xxx COMBO xxx {gameService.Combo} xxx COMBO xxx");
-        ui.ShowCombo(gameService.Combo);
-        gameService.Combo = 0;
-    }
+
 }
 
 public class PostExplosionCollisionRocksSystem : UpdateSystem
@@ -638,20 +683,77 @@ public class PostExplosionCollisionRocksSystem : UpdateSystem
     }
 }
 
+[EcsComponent]
+public struct AiPath
+{
+    public Vector3 Target;
+    public float MoveSpeed;
+    public Vector3 Dir;
+    public float Offset;
+}
+
+public class BurstEnemyMoveSystem : UpdateSystem
+{
+    private MoveJob job;
+    public override void Update()
+    {
+        job.target = Servise<GameService>.Get().PlayerTrasform.position;
+        job.target.y = 2.505f;
+        job.dt = Time.deltaTime;
+        job.offest= 2.505f;
+        entities.Without<Dead,DeathState>().EachWithJob<MoveJob, AiPath, TransformComponent, RunState, Dead, DeathState>(ref job);
+    }
+
+    struct MoveJob : IJobExecute<AiPath, TransformComponent, RunState>
+    {
+        public float offest;
+        public float dt;
+        public Vector3 target;
+        public void ForEach(ref AiPath path, ref TransformComponent transform, ref RunState r)
+        {
+            if (path.Target.x == 0)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, target, dt * path.MoveSpeed);
+            }
+            else
+            {
+                transform.position = Vector3.MoveTowards(transform.position, path.Target, dt * path.MoveSpeed);
+            }
+            //path.Dir = (target- transform.position).normalized;
+            
+            //transform.position += path.Dir * path.MoveSpeed * dt;
+            transform.position.y = offest;
+        }
+    }
+}
+
 public class EnemyMoveSystem : UpdateSystem
 {
     private float delay;
+    private float constDelayt = 0.5f;
     public override void Update()
     {
-        var dt = Time.deltaTime;
-        entities.Without<Dead>().Each((EnemyRef enemyRef, RunState runState, ref NoBurst tag) =>
+
+        delay += Time.deltaTime;
+        entities.Without<Dead>().Each((EnemyRef enemyRef, RunState runState, NoBurst tag, ref AiPath path) =>
         {
-            delay += dt;
-            if (delay > 1f)
+            if (delay > constDelayt)
             {
-                if(enemyRef.NavMeshAgentVelue.isOnNavMesh)
-                    enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
+                // if(enemyRef.NavMeshAgentVelue.isOnNavMesh)
+                //     enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
+                //if(enemyRef.NavMeshAgentVelue.isOnNavMesh)
+                enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
+                if (enemyRef.NavMeshAgentVelue.isOnNavMesh)
+                {
+                    enemyRef.NavMeshAgentVelue.CalculatePath(enemyRef.MoveToTargetValue.position,
+                        enemyRef.NavMeshAgentVelue.path);
+                    //enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
+                    if(enemyRef.NavMeshAgentVelue.path.corners.Length > 0)
+                        path.Target = enemyRef.NavMeshAgentVelue.path.corners[0];
+                }
+
                 delay = 0f;
+                //path.Target = enemyRef.NavMeshAgentVelue.path.corners[0];
             }
         });
     }
@@ -669,7 +771,7 @@ public class SpriteRender
     public SpriteRenderer Value;
 }
 [EcsComponent] public class AttackState{}
-[EcsComponent] public class RunState{}
+[EcsComponent] public struct RunState{}
 public class EnemyAISystem : UpdateSystem
 {
     private const float LOW_AGENT_DISTANCE = 50f;
@@ -685,7 +787,7 @@ public class EnemyAISystem : UpdateSystem
             else
                 enemy.NavMeshAgentVelue.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
             
-            if (distance <= enemy.AttackRange)
+            if (distance < enemy.AttackRange)
             {
                 enemy.State = EnemyState.Attack;
                 enemy.NavMeshAgentVelue.SetDestination(transform.position);
@@ -703,6 +805,11 @@ public class EnemyAISystem : UpdateSystem
     }
 }
 
+[EcsComponent]
+public class SpriteEntity
+{
+    public MonoEntity Value;
+}
 [EcsComponent]
 public class Damaged
 {
@@ -766,58 +873,7 @@ public class GameOverSystem : UpdateSystem
         });
     }
 }
-public class EnemySpriteAnimationSystem : UpdateSystem
-{
-    public override void Update()
-    {
-        var dt = Time.deltaTime;
-        entities.Without<Dead>().Each((Entity entity, EnemyRef enemy, SpriteAnim animation, SpriteRender render, Damage damage) =>
-        {
-            var spriteRenderer = render.Value;
-            var spriteAnimation = animation.Value;
-            switch (enemy.State)
-            {
-                case EnemyState.Run:
-                    PlayAnimation(ref spriteAnimation.Run, animation.Value, spriteRenderer,dt);
-                    break;
-                case EnemyState.Attack:
-                    PlayAnimation(ref spriteAnimation.Attack, animation.Value, spriteRenderer,dt);
-                    if (spriteAnimation.Attack.CurrentAnimation == spriteAnimation.AttackFrame && spriteAnimation.AttackFrameEnd)
-                    {
-                        spriteAnimation.AttackFrameEnd = false;
-                        entity.Set<AttackEvent>();
-                    }
-                    break;
-                case EnemyState.Death:
-                    SetDeadSprite(ref spriteAnimation.Death, spriteRenderer);
-                    break;
-                case EnemyState.Dead:
-                    
-                     break;
 
-            }
-        });
-    }
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void SetDeadSprite(ref Animation animation, SpriteRenderer render)
-    {
-        render.sprite = animation.Frames[0];
-    }
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void PlayAnimation(ref Animation animation, SpriteAnimation animator, SpriteRenderer render, float dt)
-    {
-        animator.CurruntFrameTime += dt;
-        if (animator.CurruntFrameTime >= animator.FrameTime)
-        {
-            animation.CurrentAnimation++;
-            if (animation.CurrentAnimation == animation.Frames.Length)
-                animation.CurrentAnimation = 0;
-            render.sprite = animation.Frames[animation.CurrentAnimation];
-            animator.CurruntFrameTime = 0f;
-            animator.AttackFrameEnd = true;
-        }
-    }
-}
 [EcsComponent] 
 public class StayDeadCountDown
 {

@@ -70,6 +70,7 @@ public class UIController : MonoBehaviour
     }
     public void GameOver()
     {
+        Cursor.lockState = CursorLockMode.None;
         _gameOver.SetActive(true);
     }
 }

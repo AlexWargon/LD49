@@ -43,17 +43,19 @@ public class EnemySpawner : MonoBehaviour
             enemy.Entity.Remove<Dead>();
             enemy.Entity.Remove<UnActive>();
             enemy.Entity.Remove<DeathState>();
-            enemy.Entity.Add(new EnemySpawnEvent());
-            
+
             enemy.gameObject.SetActive(true);
             
             var x = Random.Range(-14, 14);
             var z = Random.Range(-14, 14);
-            var spawnpos = new Vector3(spawner.position.x + x, spawner.position.y,spawner.position.z + z);
+            var spawnpos = new Vector3(spawner.position.x + x, 2.51f,spawner.position.z + z);
             var transform1 = enemy.transform;
             transform1.position = spawnpos;
             transform1.rotation = Quaternion.identity;
-            enemy.Get<EnemyRef>().NavMeshAgentVelue.enabled = true;
+            enemy.Entity.Set<CanRotate>();
+            enemy.Entity.Set<CanRun>();
+            enemy.Entity.Get<ColliderRef>().Value.enabled = true;
+            enemy.Entity.Add(new EnemySpawnEvent());
         }
     }
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -39,7 +39,35 @@ public static class EcsExtensions
         job.Clear();
 #endif
     }
-
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void EachWithJob<AExecutor, A, B, NA>(this Entities.EntitiesWithout<NA> ezs, ref AExecutor jobExecute) where A : unmanaged
+        where B : unmanaged
+        where AExecutor : unmanaged, IJobExecute<A, B>
+    {
+        var entityType = ezs.GetEntityType<A, B>();
+        var entities = entityType.entities;
+        EachWithJob<A, B, AExecutor> job = default;
+        job.Set(entities, entityType.poolA.items, entityType.poolB.items, ref jobExecute);
+        job.Schedule(entityType.Count, 0).Complete();
+#if UNITY_EDITOR
+        job.Clear();
+#endif
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void EachWithJob<AExecutor, A, B, NA, NB>(this Entities.EntitiesWithout<NA,NB> ezs, ref AExecutor jobExecute) where A : unmanaged
+        where B : unmanaged
+        where AExecutor : unmanaged, IJobExecute<A, B>
+    {
+        var entityType = ezs.GetEntityTypeWithout<A, B>();
+        var entities = entityType.entities;
+        EachWithJob<A, B, AExecutor> job = default;
+        job.Set(entities, entityType.poolA.items, entityType.poolB.items, ref jobExecute);
+        job.Schedule(entityType.Count, 0).Complete();
+#if UNITY_EDITOR
+        job.Clear();
+#endif
+    }
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void EachWithJob<AExecutor, A, B, C>(this Entities ezs, ref AExecutor jobExecute) where A : unmanaged
         where B : unmanaged
@@ -52,7 +80,21 @@ public static class EcsExtensions
         job.Set(entities, entityType.poolA.items, entityType.poolB.items, entityType.poolС.items, ref jobExecute);
         job.Schedule(entityType.Count, 0).Complete();
     }
-
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void EachWithJob<AExecutor, A, B,C, NA, NB>(this Entities.EntitiesWithout<NA,NB> ezs, ref AExecutor jobExecute) where A : unmanaged
+        where B : unmanaged
+        where C : unmanaged
+        where AExecutor : unmanaged, IJobExecute<A, B, C>
+    {
+        var entityType = ezs.GetEntityTypeWithout<A, B, C>();
+        var entities = entityType.entities;
+        EachWithJob<A, B, C, AExecutor> job = default;
+        job.Set(entities, entityType.poolA.items, entityType.poolB.items, entityType.poolС.items, ref jobExecute);
+        job.Schedule(entityType.Count, 0).Complete();
+#if UNITY_EDITOR
+        job.Clear();
+#endif
+    }
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void EachWithJob<AExecutor, A, B, C, D>(this Entities ezs, ref AExecutor jobExecute)
         where A : unmanaged
@@ -211,6 +253,7 @@ public struct TransformComponent
     public Vector3 scale;
     public Quaternion rotation;
     public Vector3 right;
+    public Vector3 forward;
 }
 
 public interface IJobExecute<T>
@@ -350,6 +393,16 @@ public struct EachWithJob<A, B, C, Executor> : IJobParallelFor
         ItemsA.Array[entity] = itemA;
         ItemsB.Array[entity] = itemB;
         ItemsC.Array[entity] = itemC;
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Clear()
+    {
+#if UNITY_EDITOR
+        NativeMagic.UnwrapFromNative(Entites);
+        NativeMagic.UnwrapFromNative(ItemsA);
+        NativeMagic.UnwrapFromNative(ItemsB);
+        NativeMagic.UnwrapFromNative(ItemsC);
+#endif
     }
 }
 

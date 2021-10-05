@@ -131,7 +131,7 @@ NavMeshAgent:
   m_Speed: 5
   m_Acceleration: 8
   avoidancePriority: 50
-  m_AngularSpeed: 120
+  m_AngularSpeed: 32
   m_StoppingDistance: 0.09
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
@@ -169,6 +169,8 @@ MonoBehaviour:
   - id: 10
   - id: 11
   - id: 12
+  - id: 13
+  - id: 14
   runTime: 0
   destroyObject: 0
   destroyComponent: 0
@@ -202,6 +204,7 @@ MonoBehaviour:
         scale: {x: 1, y: 1, z: 1}
         rotation: {x: 0, y: 0, z: 0, w: 0}
         right: {x: 0, y: 0, z: 0}
+        forward: {x: 0, y: 0, z: 0}
     00000005:
       type: {class: EnemySpawnEvent, ns: , asm: Assembly-CSharp}
     00000006:
@@ -235,6 +238,18 @@ MonoBehaviour:
         Bullet: {fileID: 6740097390296247759, guid: a84028bdbdf69f94b861abf103689b40,
           type: 3}
         FirePoint: {fileID: 5579033206827514175}
+    0000000D:
+      type: {class: AiPath, ns: , asm: Assembly-CSharp}
+      data:
+        Target: {x: 0, y: 0, z: 0}
+        MoveSpeed: 5
+        Dir: {x: 0, y: 0, z: 0}
+        Offset: 1
+    0000000E:
+      type: {class: EnemySprite, ns: , asm: Assembly-CSharp}
+      data:
+        Dir: {x: 0, y: 0, z: 0}
+        Euler: {x: 0, y: 0, z: 0}
 --- !u!136 &8038306348812378494
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -246,7 +261,7 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
-  m_Height: 3.58
+  m_Height: 3.33
   m_Direction: 1
   m_Center: {x: 0, y: -0.29, z: 0}
 --- !u!114 &4683617440399727837

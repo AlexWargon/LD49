@@ -17,6 +17,7 @@ public class LoadNextScene : MonoBehaviour
 
     public void PlayAgen()
     {
+        Cursor.lockState = CursorLockMode.Locked;
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 

@@ -55,7 +55,8 @@ namespace Wargon.ezs.Unity {
             if(!destroyObject)
                 if(world!= null)
                     if(world.Alive)
-                        Entity.Destroy();
+                        if(!Entity.IsDead())
+                            Entity.Destroy();
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetActive(bool state)

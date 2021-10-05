@@ -83,8 +83,8 @@ public class Actor : MonoBehaviour
         m_SlideLimit = m_Controller.slopeLimit - .1f;
         m_JumpTimer = m_AntiBunnyHopFactor;
 
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.lockState = CursorLockMode.Confined;
+        // Cursor.lockState = CursorLockMode.None;
+        // Cursor.lockState = CursorLockMode.Confined;
     }
 
 
@@ -93,16 +93,16 @@ public class Actor : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             usingKeyboard = !usingKeyboard;
-            Debug.Log(usingKeyboard);
-            if (usingKeyboard)
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-                //Cursor.lockState = CursorLockMode.Confined;
-            }
-            else
-            {
-                Cursor.lockState = CursorLockMode.None;
-            }
+            // Debug.Log(usingKeyboard);
+            // if (usingKeyboard)
+            // {
+            //     Cursor.lockState = CursorLockMode.Locked;
+            //     //Cursor.lockState = CursorLockMode.Confined;
+            // }
+            // else
+            // {
+            //     Cursor.lockState = CursorLockMode.None;
+            // }
         }
 
         // If the run button is set to toggle, then switch between walk/run speed. (We use Update for this...
