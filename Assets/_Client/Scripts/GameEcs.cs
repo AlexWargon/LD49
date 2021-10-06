@@ -51,9 +51,10 @@ public class GameEcs : MonoBehaviour
                 //.Add(new EnemyAttakStateSystem())
                 
                 
-                .Add(new EnemyMoveSystem())
+                //.Add(new EnemyMoveSystem())
                 .Add(new BurstEnemySpriteRotationSystem())
                 .Add(new BurstEnemyMoveSystem())
+                .Add(new BurstCheckGroundSystem())
                 .Add(new DeadEnemyLayDownCountDonwSystem())
                 
                 .Add(new GameOverSystem())
@@ -95,7 +96,7 @@ public class GameEcs : MonoBehaviour
     }
     void Update()
     {
-        if (World != null)
+        if (GameReady)
         {
             updateSystems.OnUpdate();
         }
@@ -103,6 +104,7 @@ public class GameEcs : MonoBehaviour
 
     private void OnDestroy()
     {
+        GameReady = false;
         if (updateSystems != null)
         {
             updateSystems = null;
@@ -165,7 +167,7 @@ public class OnEnemySpawnSystem : UpdateSystem
             anim.Value.Run.CurrentAnimation = Random.Range(0, anim.Value.Run.Frames.Length - 1);
             enemyRef.TargetEntity = Servise<GameService>.Get().PlayerEntity;
             enemyRef.MoveToTargetValue = Servise<GameService>.Get().PlayerTrasform;
-            enemyRef.NavMeshAgentVelue.enabled = true;
+            //enemyRef.NavMeshAgentVelue.enabled = true;
         });
     }
 }
@@ -607,7 +609,7 @@ public class PostExplosionCollisionEnemySystem : UpdateSystem
             comboShowDelay = 0f;
             enemy.State = EnemyState.Death;
             ui.AddKills();
-            enemy.NavMeshAgentVelue.enabled = false;
+            //enemy.NavMeshAgentVelue.enabled = false;
             var dir = (transformRef.Value.position - damaged.From).normalized;
             if (dir.y < 0.1f)
                 dir.y = Random.Range(0.4f, 1f);
@@ -697,8 +699,8 @@ public class BurstEnemyMoveSystem : UpdateSystem
     private MoveJob job;
     public override void Update()
     {
-        job.target = Servise<GameService>.Get().PlayerTrasform.position;
-        job.target.y = 2.505f;
+        job.target = Servise<GameService>.Get().PlayerCaneraTransform.position;
+
         job.dt = Time.deltaTime;
         job.offest= 2.505f;
         entities.Without<Dead,DeathState>().EachWithJob<MoveJob, AiPath, TransformComponent, RunState, Dead, DeathState>(ref job);
@@ -722,7 +724,7 @@ public class BurstEnemyMoveSystem : UpdateSystem
             //path.Dir = (target- transform.position).normalized;
             
             //transform.position += path.Dir * path.MoveSpeed * dt;
-            transform.position.y = offest;
+            //transform.position.y = offest;
         }
     }
 }
@@ -742,15 +744,15 @@ public class EnemyMoveSystem : UpdateSystem
                 // if(enemyRef.NavMeshAgentVelue.isOnNavMesh)
                 //     enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
                 //if(enemyRef.NavMeshAgentVelue.isOnNavMesh)
-                enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
-                if (enemyRef.NavMeshAgentVelue.isOnNavMesh)
-                {
-                    enemyRef.NavMeshAgentVelue.CalculatePath(enemyRef.MoveToTargetValue.position,
-                        enemyRef.NavMeshAgentVelue.path);
-                    //enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
-                    if(enemyRef.NavMeshAgentVelue.path.corners.Length > 0)
-                        path.Target = enemyRef.NavMeshAgentVelue.path.corners[0];
-                }
+                // enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
+                // if (enemyRef.NavMeshAgentVelue.isOnNavMesh)
+                // {
+                //     enemyRef.NavMeshAgentVelue.CalculatePath(enemyRef.MoveToTargetValue.position,
+                //         enemyRef.NavMeshAgentVelue.path);
+                //     //enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
+                //     if(enemyRef.NavMeshAgentVelue.path.corners.Length > 0)
+                //         path.Target = enemyRef.NavMeshAgentVelue.path.corners[0];
+                // }
 
                 delay = 0f;
                 //path.Target = enemyRef.NavMeshAgentVelue.path.corners[0];
@@ -782,15 +784,15 @@ public class EnemyAISystem : UpdateSystem
             var transform = TransformRef.Value;
             var distance = Vector3.Distance(transform.position, enemy.MoveToTargetValue.position);
             
-            if (distance > LOW_AGENT_DISTANCE)
-                enemy.NavMeshAgentVelue.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
-            else
-                enemy.NavMeshAgentVelue.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
+            // if (distance > LOW_AGENT_DISTANCE)
+            //     enemy.NavMeshAgentVelue.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
+            // else
+            //     enemy.NavMeshAgentVelue.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
             
             if (distance < enemy.AttackRange)
             {
                 enemy.State = EnemyState.Attack;
-                enemy.NavMeshAgentVelue.SetDestination(transform.position);
+                //enemy.NavMeshAgentVelue.SetDestination(transform.position);
                 entity.Set<AttackState>();
                 entity.Remove<RunState>();
             }
@@ -868,8 +870,9 @@ public class GameOverSystem : UpdateSystem
         entities.Each((Entity entity, GameOver gameover) =>
         {
             Debug.Log("GAMEOVER");
-            Time.timeScale = 0;
+            //Time.timeScale = 0;
             entity.Destroy();
+            GameEcs.GameReady = false;
         });
     }
 }
@@ -951,5 +954,23 @@ public class DamagePlayerByEnemyExplosionSystem : UpdateSystem
             entity.Remove<Damaged>();
         });
         
+    }
+}
+
+public class BurstCheckGroundSystem : UpdateSystem
+{
+    private JobCast job;
+    public override void Update()
+    {
+        entities.Without<Dead,DeathState>().EachWithJobRaycast(ref job, Vector3.down);
+    }
+    struct JobCast : IJobExecute<TransformComponent, RaycastHit>
+    {
+        public void ForEach(ref TransformComponent transform, ref RaycastHit raycast)
+        {
+            transform.position.y = raycast.distance;
+            Debug.DrawLine(transform.position, raycast.point, Color.green);
+            //Debug.Log(raycast.distance);
+        }
     }
 }

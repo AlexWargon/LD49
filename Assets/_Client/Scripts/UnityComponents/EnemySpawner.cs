@@ -84,7 +84,7 @@ public class EnemySpawner : MonoBehaviour
             {
                 var monoEntity = Instantiate(RangeEnemy, spawnVector, Quaternion.identity, thisTransform);
                 monoEntity.ConvertToEntity();
-                monoEntity.Get<EnemyRef>().NavMeshAgentVelue.enabled = false;
+                //monoEntity.Get<EnemyRef>().NavMeshAgentVelue.enabled = false;
                 monoEntity.Entity.Set<Dead>();
                 monoEntity.Entity.Set<UnActive>();
                 monoEntity.gameObject.SetActive(false);
@@ -95,7 +95,7 @@ public class EnemySpawner : MonoBehaviour
             {
                 var monoEntity = Instantiate(MeleeEnemy, spawnVector, Quaternion.identity, thisTransform);
                 monoEntity.ConvertToEntity();
-                monoEntity.Get<EnemyRef>().NavMeshAgentVelue.enabled = false;
+                //monoEntity.Get<EnemyRef>().NavMeshAgentVelue.enabled = false;
                 monoEntity.Entity.Set<Dead>();
                 monoEntity.Entity.Set<UnActive>();
                 monoEntity.gameObject.SetActive(false);

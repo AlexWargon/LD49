@@ -56,7 +56,6 @@ MonoBehaviour:
   - id: 2
   - id: 3
   - id: 4
-  - id: 5
   runTime: 0
   destroyObject: 0
   destroyComponent: 0
@@ -68,13 +67,6 @@ MonoBehaviour:
       data:
         Value: {fileID: 4669025227510113693}
     00000001:
-      type: {class: TransformComponent, ns: , asm: Assembly-CSharp}
-      data:
-        position: {x: 0, y: 0, z: 0}
-        scale: {x: 1, y: 1, z: 1}
-        rotation: {x: 0, y: 0, z: 0, w: 0}
-        right: {x: 0, y: 0, z: 0}
-    00000002:
       type: {class: Pooled, ns: , asm: Assembly-CSharp}
       data:
         containerIndex: 0
@@ -82,15 +74,15 @@ MonoBehaviour:
         CurrentLifeTime: 5
         mono: {fileID: 6740097390296247759}
         IsActive: 0
-    00000003:
+    00000002:
       type: {class: MoveSpeed, ns: , asm: Assembly-CSharp}
       data:
         Value: 18
-    00000004:
+    00000003:
       type: {class: Direction, ns: , asm: Assembly-CSharp}
       data:
         Value: {x: 0, y: 0, z: 0}
-    00000005:
+    00000004:
       type: {class: Impact, ns: , asm: Assembly-CSharp}
       data:
         Value: {fileID: 2033188891449925643, guid: 8dcd996c82cfae047890dad8e34e85c2,

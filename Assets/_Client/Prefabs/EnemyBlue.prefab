@@ -40,7 +40,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6010544723229177730}
   - component: {fileID: 6010544723229177729}
-  - component: {fileID: 6010544723229177728}
   - component: {fileID: 6010544723229177743}
   - component: {fileID: 8038306348812378494}
   - component: {fileID: 4683617440399727837}
@@ -85,7 +84,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 961ef2122709028498f3dc98d4794edf, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -118,28 +117,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!195 &6010544723229177728
-NavMeshAgent:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6010544723229177742}
-  m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 0.5
-  m_Speed: 5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 32
-  m_StoppingDistance: 0.09
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 4.39
-  m_BaseOffset: 2.1
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!114 &6010544723229177743
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -187,7 +164,7 @@ MonoBehaviour:
           id: 0
           generation: 0
         MoveToTargetValue: {fileID: 0}
-        NavMeshAgentVelue: {fileID: 6010544723229177728}
+        NavMeshAgentVelue: {fileID: 0}
         State: 0
     00000001:
       type: {class: CanTakeDamageByExplosion, ns: , asm: Assembly-CSharp}

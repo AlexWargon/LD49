@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -7,7 +8,7 @@ using UnityEngine;
 using Wargon.ezs;
 using Wargon.ezs.Unity;
 
-public static class EcsExtensions
+public static partial class EcsExtensions
 {
     public static MonoEntity GetMonoEntity(this GameObject gameObject)
     {
@@ -259,7 +260,7 @@ public struct TransformComponent
 public interface IJobExecute<T>
     where T : unmanaged
 {
-    void Each(ref T t);
+    void ForEach(ref T t);
 }
 
 public interface IJobExecute<T, T2>
@@ -282,7 +283,7 @@ public interface IJobExecute<T, T2, T3, T4>
     where T3 : unmanaged
     where T4 : unmanaged
 {
-    void Execute(ref T t, ref T2 t2, ref T3 t3, ref T4 t4);
+    void ForEach(ref T t, ref T2 t2, ref T3 t3, ref T4 t4);
 }
 
 public interface IJobExecute<T, T2, T3, T4, T5>
@@ -292,10 +293,10 @@ public interface IJobExecute<T, T2, T3, T4, T5>
     where T4 : unmanaged
     where T5 : unmanaged
 {
-    void Execute(ref T t, ref T2 t2, ref T3 t3, ref T4 t4, ref T5 t5);
+    void ForEach(ref T t, ref T2 t2, ref T3 t3, ref T4 t4, ref T5 t5);
 }
 
-[BurstCompile]
+[BurstCompile(CompileSynchronously = true)]
 public struct EachWithJob<A, Executor> : IJobParallelFor
     where Executor : unmanaged, IJobExecute<A>
     where A : unmanaged
@@ -317,12 +318,12 @@ public struct EachWithJob<A, Executor> : IJobParallelFor
     {
         var entity = Entites.Array[index];
         var item = ItemsA.Array[entity];
-        executionFunc.Each(ref item);
+        executionFunc.ForEach(ref item);
         ItemsA.Array[entity] = item;
     }
 }
 
-[BurstCompile]
+[BurstCompile(CompileSynchronously = true)]
 public struct EachWithJob<A, B, Executor> : IJobParallelFor
     where Executor : unmanaged, IJobExecute<A, B>
     where A : unmanaged
@@ -361,7 +362,7 @@ public struct EachWithJob<A, B, Executor> : IJobParallelFor
     }
 }
 
-[BurstCompile]
+[BurstCompile(CompileSynchronously = true)]
 public struct EachWithJob<A, B, C, Executor> : IJobParallelFor
     where Executor : unmanaged, IJobExecute<A, B, C>
     where A : unmanaged
@@ -406,7 +407,7 @@ public struct EachWithJob<A, B, C, Executor> : IJobParallelFor
     }
 }
 
-[BurstCompile]
+[BurstCompile(CompileSynchronously = true)]
 public struct EachWithJob<A, B, C, D, Executor> : IJobParallelFor
     where Executor : unmanaged, IJobExecute<A, B, C, D>
     where A : unmanaged
@@ -439,7 +440,7 @@ public struct EachWithJob<A, B, C, D, Executor> : IJobParallelFor
         var itemC = ItemsC.Array[entity];
         var itemD = ItemsD.Array[entity];
 
-        executionFunc.Execute(ref itemA, ref itemB, ref itemC, ref itemD);
+        executionFunc.ForEach(ref itemA, ref itemB, ref itemC, ref itemD);
 
         ItemsA.Array[entity] = itemA;
         ItemsB.Array[entity] = itemB;
@@ -448,7 +449,7 @@ public struct EachWithJob<A, B, C, D, Executor> : IJobParallelFor
     }
 }
 
-[BurstCompile]
+[BurstCompile(CompileSynchronously = true)]
 public struct EachWithJob<A, B, C, D, E, Executor> : IJobParallelFor
     where Executor : unmanaged, IJobExecute<A, B, C, D, E>
     where A : unmanaged
@@ -485,7 +486,7 @@ public struct EachWithJob<A, B, C, D, E, Executor> : IJobParallelFor
         var itemD = ItemsD.Array[entity];
         var itemE = ItemsE.Array[entity];
 
-        executionFunc.Execute(ref itemA, ref itemB, ref itemC, ref itemD, ref itemE);
+        executionFunc.ForEach(ref itemA, ref itemB, ref itemC, ref itemD, ref itemE);
 
         ItemsA.Array[entity] = itemA;
         ItemsB.Array[entity] = itemB;
@@ -494,6 +495,139 @@ public struct EachWithJob<A, B, C, D, E, Executor> : IJobParallelFor
         ItemsE.Array[entity] = itemE;
     }
 }
+
+public static partial class EcsExtensions
+{
+
+    public static void EachWithJobRaycast<AExecutor, NA>(this Entities.EntitiesWithout<NA> ezs, ref AExecutor jobExecute, Vector3 direction)
+        where AExecutor : unmanaged, 
+        IJobExecute<TransformComponent, RaycastHit>
+    {
+        var entityType = ezs.GetEntityTypeWithout<TransformComponent>();
+        var transforms = entityType.poolA.items;
+        var entities = entityType.entities;
+
+        var results = new NativeArray<RaycastHit>(transforms.Length, Allocator.Persistent);
+        var commands = new NativeArray<RaycastCommand>(transforms.Length, Allocator.Persistent);
+        
+        for (int i = 0; i < entityType.Count; i++)
+        {
+            var entity = entities[i];
+            commands[entity] = new RaycastCommand(transforms[entity].position, direction);
+        }
+
+        RaycastCommand.ScheduleBatch(commands, results, 10).Complete();
+
+        EachJobWithRaycast<TransformComponent,AExecutor> job = default;
+        job.RaycastHits = results;
+        job.ItemsA = NativeMagic.WrapToNative(transforms);
+        job.Entities = NativeMagic.WrapToNative(entities);
+        job.Schedule(entityType.Count, 0).Complete();
+        
+        results.Dispose();
+        commands.Dispose();
+#if UNITY_EDITOR
+        job.Clear();
+#endif
+    }
+    
+    public static void EachWithJobRaycast<AExecutor, NA, NB>(this Entities.EntitiesWithout<NA,NB> ezs, ref AExecutor jobExecute, Vector3 direction)
+        where AExecutor : unmanaged, 
+        IJobExecute<TransformComponent, RaycastHit>
+    {
+        var entityType = ezs.GetEntityTypeWithout<TransformComponent>();
+        var transforms = entityType.poolA.items;
+        var entities = entityType.entities;
+
+        var results = new NativeArray<RaycastHit>(transforms.Length, Allocator.Persistent);
+        var commands = new NativeArray<RaycastCommand>(transforms.Length, Allocator.Persistent);
+        
+        for (int i = 0; i < entityType.Count; i++)
+        {
+            var entity = entities[i];
+            commands[entity] = new RaycastCommand(transforms[entity].position, direction);
+        }
+
+        RaycastCommand.ScheduleBatch(commands, results, 10).Complete();
+
+        EachJobWithRaycast<TransformComponent,AExecutor> job = default;
+        job.RaycastHits = results;
+        job.ItemsA = NativeMagic.WrapToNative(transforms);
+        job.Entities = NativeMagic.WrapToNative(entities);
+        job.Schedule(entityType.Count, 0).Complete();
+        
+        results.Dispose();
+        commands.Dispose();
+#if UNITY_EDITOR
+        job.Clear();
+#endif
+    }
+    [BurstCompile]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int GetColliderID(this RaycastHit hit)
+    {
+        unsafe
+        {
+            RaycastHitPublic h = *(RaycastHitPublic*)&hit;
+            return h.ColliderID;
+        }
+    }
+}
+
+[EcsComponent]
+[StructLayout(LayoutKind.Sequential)]
+public struct RaycastHitPublic
+{
+    public Vector3 Point;
+    public Vector3 Normal;
+    public int FaceID;
+    public float Distance;
+    public Vector2 UV;
+    public int ColliderID;
+}
+public struct EachJobWithRaycast<A, Executor> : IJobParallelFor 
+    where Executor : unmanaged, IJobExecute<A, RaycastHit>
+    where A : unmanaged
+{
+    [ReadOnly]
+    public NativeArray<RaycastHit> RaycastHits;
+    public NativeWrappedData<A> ItemsA;
+    public NativeWrappedData<int> Entities;
+    public Executor Action;
+    public void Execute(int index)
+    {
+        var entity = Entities.Array[index];
+        var itemA = ItemsA.Array[entity];
+        var raycast = RaycastHits[entity];
+        Action.ForEach(ref itemA, ref raycast);
+        ItemsA.Array[entity] = itemA;
+    }
+#if UNITY_EDITOR
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Clear()
+    {
+        NativeMagic.UnwrapFromNative(ItemsA);
+    }
+#endif 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /// <summary>

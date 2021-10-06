@@ -162,7 +162,7 @@ public class SyncTransformSystem : UpdateSystem
             
         }
 
-        [BurstCompile]
+        [BurstCompile(CompileSynchronously = true)]
         struct TransformSynchronizeJob : IJobParallelForTransform
         {
             public NativeWrappedData<TransformComponent> transformComponents;
