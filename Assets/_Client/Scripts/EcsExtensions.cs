@@ -40,8 +40,10 @@ public static partial class EcsExtensions
         job.Clear();
 #endif
     }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void EachWithJob<AExecutor, A, B, NA>(this Entities.EntitiesWithout<NA> ezs, ref AExecutor jobExecute) where A : unmanaged
+    public static void EachWithJob<AExecutor, A, B, NA>(this Entities.EntitiesWithout<NA> ezs, ref AExecutor jobExecute)
+        where A : unmanaged
         where B : unmanaged
         where AExecutor : unmanaged, IJobExecute<A, B>
     {
@@ -54,8 +56,10 @@ public static partial class EcsExtensions
         job.Clear();
 #endif
     }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void EachWithJob<AExecutor, A, B, NA, NB>(this Entities.EntitiesWithout<NA,NB> ezs, ref AExecutor jobExecute) where A : unmanaged
+    public static void EachWithJob<AExecutor, A, B, NA, NB>(this Entities.EntitiesWithout<NA, NB> ezs,
+        ref AExecutor jobExecute) where A : unmanaged
         where B : unmanaged
         where AExecutor : unmanaged, IJobExecute<A, B>
     {
@@ -68,7 +72,7 @@ public static partial class EcsExtensions
         job.Clear();
 #endif
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void EachWithJob<AExecutor, A, B, C>(this Entities ezs, ref AExecutor jobExecute) where A : unmanaged
         where B : unmanaged
@@ -81,8 +85,10 @@ public static partial class EcsExtensions
         job.Set(entities, entityType.poolA.items, entityType.poolB.items, entityType.poolС.items, ref jobExecute);
         job.Schedule(entityType.Count, 0).Complete();
     }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void EachWithJob<AExecutor, A, B,C, NA, NB>(this Entities.EntitiesWithout<NA,NB> ezs, ref AExecutor jobExecute) where A : unmanaged
+    public static void EachWithJob<AExecutor, A, B, C, NA, NB>(this Entities.EntitiesWithout<NA, NB> ezs,
+        ref AExecutor jobExecute) where A : unmanaged
         where B : unmanaged
         where C : unmanaged
         where AExecutor : unmanaged, IJobExecute<A, B, C>
@@ -96,6 +102,7 @@ public static partial class EcsExtensions
         job.Clear();
 #endif
     }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void EachWithJob<AExecutor, A, B, C, D>(this Entities ezs, ref AExecutor jobExecute)
         where A : unmanaged
@@ -121,9 +128,9 @@ public static partial class EcsExtensions
             lambda(ref a[entities[index]]);
     }
 
-    public static void Each<A,B,C,NA>(this Entities.EntitiesWithout<NA> ezs, LambdaRRC<A,B,C> lambda)
+    public static void Each<A, B, C, NA>(this Entities.EntitiesWithout<NA> ezs, LambdaRRC<A, B, C> lambda)
     {
-        var entityType = ezs.GetEntityTypeWithout<A,B,C>();
+        var entityType = ezs.GetEntityTypeWithout<A, B, C>();
         var entities = entityType.entities;
         var a = entityType.poolA.items;
         var b = entityType.poolB.items;
@@ -133,9 +140,10 @@ public static partial class EcsExtensions
                 ref b[entities[index]],
                 c[entities[index]]);
     }
-    public static void Each<A,B,NA>(this Entities.EntitiesWithout<NA> ezs, LambdaRef<A,B> lambda)
+
+    public static void Each<A, B, NA>(this Entities.EntitiesWithout<NA> ezs, LambdaRef<A, B> lambda)
     {
-        var entityType = ezs.GetEntityTypeWithout<A,B>();
+        var entityType = ezs.GetEntityTypeWithout<A, B>();
         var entities = entityType.entities;
         var a = entityType.poolA.items;
         var b = entityType.poolB.items;
@@ -143,9 +151,10 @@ public static partial class EcsExtensions
             lambda(ref a[entities[index]],
                 ref b[entities[index]]);
     }
-    public static void Each<A,B,C,NA>(this Entities.EntitiesWithout<NA> ezs, LambdaRef<A,B,C> lambda)
+
+    public static void Each<A, B, C, NA>(this Entities.EntitiesWithout<NA> ezs, LambdaRef<A, B, C> lambda)
     {
-        var entityType = ezs.GetEntityTypeWithout<A,B,C>();
+        var entityType = ezs.GetEntityTypeWithout<A, B, C>();
         var entities = entityType.entities;
         var a = entityType.poolA.items;
         var b = entityType.poolB.items;
@@ -155,9 +164,10 @@ public static partial class EcsExtensions
                 ref b[entities[index]],
                 ref c[entities[index]]);
     }
-    public static void Each<A,B,C,D,NA>(this Entities.EntitiesWithout<NA> ezs, LambdaRef<A,B,C,D> lambda)
+
+    public static void Each<A, B, C, D, NA>(this Entities.EntitiesWithout<NA> ezs, LambdaRef<A, B, C, D> lambda)
     {
-        var entityType = ezs.GetEntityTypeWithout<A,B,C,D>();
+        var entityType = ezs.GetEntityTypeWithout<A, B, C, D>();
         var entities = entityType.entities;
         var a = entityType.poolA.items;
         var b = entityType.poolB.items;
@@ -169,9 +179,10 @@ public static partial class EcsExtensions
                 ref c[entities[index]],
                 ref d[entities[index]]);
     }
-    public static void Each<A,B,C,D,E,NA>(this Entities.EntitiesWithout<NA> ezs, LambdaRef<A,B,C,D,E> lambda)
+
+    public static void Each<A, B, C, D, E, NA>(this Entities.EntitiesWithout<NA> ezs, LambdaRef<A, B, C, D, E> lambda)
     {
-        var entityType = ezs.GetEntityTypeWithout<A,B,C,D,E>();
+        var entityType = ezs.GetEntityTypeWithout<A, B, C, D, E>();
         var entities = entityType.entities;
         var a = entityType.poolA.items;
         var b = entityType.poolB.items;
@@ -185,9 +196,10 @@ public static partial class EcsExtensions
                 ref d[entities[index]],
                 ref e[entities[index]]);
     }
-        public static void Each<A,B,NA,NB>(this Entities.EntitiesWithout<NA,NB> ezs, LambdaRef<A,B> lambda)
+
+    public static void Each<A, B, NA, NB>(this Entities.EntitiesWithout<NA, NB> ezs, LambdaRef<A, B> lambda)
     {
-        var entityType = ezs.GetEntityTypeWithout<A,B>();
+        var entityType = ezs.GetEntityTypeWithout<A, B>();
         var entities = entityType.entities;
         var a = entityType.poolA.items;
         var b = entityType.poolB.items;
@@ -195,9 +207,10 @@ public static partial class EcsExtensions
             lambda(ref a[entities[index]],
                 ref b[entities[index]]);
     }
-    public static void Each<A,B,C,NA,NB>(this Entities.EntitiesWithout<NA,NB> ezs, LambdaRef<A,B,C> lambda)
+
+    public static void Each<A, B, C, NA, NB>(this Entities.EntitiesWithout<NA, NB> ezs, LambdaRef<A, B, C> lambda)
     {
-        var entityType = ezs.GetEntityTypeWithout<A,B,C>();
+        var entityType = ezs.GetEntityTypeWithout<A, B, C>();
         var entities = entityType.entities;
         var a = entityType.poolA.items;
         var b = entityType.poolB.items;
@@ -207,9 +220,10 @@ public static partial class EcsExtensions
                 ref b[entities[index]],
                 ref c[entities[index]]);
     }
-    public static void Each<A,B,C,D,NA,NB>(this Entities.EntitiesWithout<NA,NB> ezs, LambdaRef<A,B,C,D> lambda)
+
+    public static void Each<A, B, C, D, NA, NB>(this Entities.EntitiesWithout<NA, NB> ezs, LambdaRef<A, B, C, D> lambda)
     {
-        var entityType = ezs.GetEntityTypeWithout<A,B,C,D>();
+        var entityType = ezs.GetEntityTypeWithout<A, B, C, D>();
         var entities = entityType.entities;
         var a = entityType.poolA.items;
         var b = entityType.poolB.items;
@@ -221,9 +235,11 @@ public static partial class EcsExtensions
                 ref c[entities[index]],
                 ref d[entities[index]]);
     }
-    public static void Each<A,B,C,D,E,NA,NB>(this Entities.EntitiesWithout<NA,NB> ezs, LambdaRef<A,B,C,D,E> lambda)
+
+    public static void Each<A, B, C, D, E, NA, NB>(this Entities.EntitiesWithout<NA, NB> ezs,
+        LambdaRef<A, B, C, D, E> lambda)
     {
-        var entityType = ezs.GetEntityTypeWithout<A,B,C,D,E>();
+        var entityType = ezs.GetEntityTypeWithout<A, B, C, D, E>();
         var entities = entityType.entities;
         var a = entityType.poolA.items;
         var b = entityType.poolB.items;
@@ -237,6 +253,7 @@ public static partial class EcsExtensions
                 ref d[entities[index]],
                 ref e[entities[index]]);
     }
+
     public static void EachWithJobs<A, NA>(this Entities.EntitiesWithout<NA> ezs, Lambda<A> lambda)
     {
         var entityType = ezs.GetEntityTypeWithout<A>();
@@ -351,14 +368,15 @@ public struct EachWithJob<A, B, Executor> : IJobParallelFor
         ItemsA.Array[entity] = itemA;
         ItemsB.Array[entity] = itemB;
     }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Clear()
     {
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         NativeMagic.UnwrapFromNative(Entites);
         NativeMagic.UnwrapFromNative(ItemsA);
         NativeMagic.UnwrapFromNative(ItemsB);
-        #endif
+#endif
     }
 }
 
@@ -395,6 +413,7 @@ public struct EachWithJob<A, B, C, Executor> : IJobParallelFor
         ItemsB.Array[entity] = itemB;
         ItemsC.Array[entity] = itemC;
     }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Clear()
     {
@@ -498,9 +517,9 @@ public struct EachWithJob<A, B, C, D, E, Executor> : IJobParallelFor
 
 public static partial class EcsExtensions
 {
-
-    public static void EachWithJobRaycast<AExecutor, NA>(this Entities.EntitiesWithout<NA> ezs, ref AExecutor jobExecute, Vector3 direction)
-        where AExecutor : unmanaged, 
+    public static void EachWithJobRaycast<AExecutor, NA>(this Entities.EntitiesWithout<NA> ezs,
+        ref AExecutor jobExecute, Vector3 direction)
+        where AExecutor : unmanaged,
         IJobExecute<TransformComponent, RaycastHit>
     {
         var entityType = ezs.GetEntityTypeWithout<TransformComponent>();
@@ -509,21 +528,110 @@ public static partial class EcsExtensions
 
         var results = new NativeArray<RaycastHit>(transforms.Length, Allocator.Persistent);
         var commands = new NativeArray<RaycastCommand>(transforms.Length, Allocator.Persistent);
-        
-        for (int i = 0; i < entityType.Count; i++)
+        for (var i = 0; i < entityType.Count; i++)
         {
             var entity = entities[i];
             commands[entity] = new RaycastCommand(transforms[entity].position, direction);
         }
-
+        
         RaycastCommand.ScheduleBatch(commands, results, 10).Complete();
 
-        EachJobWithRaycast<TransformComponent,AExecutor> job = default;
+        EachJobWithRaycast<TransformComponent, AExecutor> job = default;
         job.RaycastHits = results;
         job.ItemsA = NativeMagic.WrapToNative(transforms);
         job.Entities = NativeMagic.WrapToNative(entities);
+        job.Action = jobExecute;
         job.Schedule(entityType.Count, 0).Complete();
+
+        results.Dispose();
+        commands.Dispose();
+#if UNITY_EDITOR
+        job.Clear();
+#endif
+    }
+
+
+    [BurstCompile]
+    public static void SetupCommands(ref NativeArray<RaycastCommand> commands, in NativeWrappedData<int> entities,
+        in NativeWrappedData<TransformComponent> transforms, int count, in Vector3 offset, in Vector3 direction,
+        in float distance, int mask)
+    {
+        for (var i = 0; i < count; i++)
+        {
+            var entity = entities.Array[i];
+            commands[entity] =
+                new RaycastCommand(transforms.Array[entity].position + offset, direction, distance, mask);
+        }
+    }
+
+    public static void EachWithJobRaycast<AExecutor, NA, NB>(this Entities.EntitiesWithout<NA, NB> ezs,
+        ref AExecutor jobExecute, in Vector3 direction, in Vector3 offset, LayerMask mask, float distance)
+        where AExecutor : unmanaged, IJobExecute<TransformComponent, RaycastHit>
+    {
+        var entityType = ezs.GetEntityTypeWithout<TransformComponent>();
+        var transforms = entityType.poolA.items;
+        var entities = entityType.entities;
+
+        var results = new NativeArray<RaycastHit>(entityType.Count, Allocator.Persistent);
+        var commands = new NativeArray<RaycastCommand>(entityType.Count, Allocator.Persistent);
+
+        var maskValue = mask.value;
         
+        for (var i = 0; i < entityType.Count; i++)
+        {
+            var entity = entities[i];
+            commands[i] = new RaycastCommand(transforms[entity].position + offset, direction, distance, maskValue);
+        }
+
+        RaycastCommand.ScheduleBatch(commands, results, 10).Complete();
+
+        EachJobWithRaycast<TransformComponent, AExecutor> job;
+
+        job.RaycastHits = results;
+        job.ItemsA = NativeMagic.WrapToNative(transforms);
+        job.Entities = NativeMagic.WrapToNative(entities);
+        job.Action = jobExecute;
+        job.Schedule(entityType.Count, 0).Complete();
+
+        results.Dispose();
+        commands.Dispose();
+#if UNITY_EDITOR
+        job.Clear();
+#endif
+    }
+    public static void EachWithJobRaycast<AExecutor, NA, NB, B>(this Entities.EntitiesWithout<NA, NB> ezs,
+        ref AExecutor jobExecute, in Vector3 direction, in Vector3 offset, LayerMask mask, float distance)
+        where B : unmanaged
+        where AExecutor : unmanaged, IJobExecute<TransformComponent,B, RaycastHit>
+    {
+        var entityType = ezs.GetEntityTypeWithout<TransformComponent,B>();
+        var transforms = entityType.poolA.items;
+        var b = entityType.poolB.items;
+
+        var entities = entityType.entities;
+
+        var results = new NativeArray<RaycastHit>(entityType.Count, Allocator.Persistent);
+        var commands = new NativeArray<RaycastCommand>(entityType.Count, Allocator.Persistent);
+
+        var maskValue = mask.value;
+        
+        for (var i = 0; i < entityType.Count; i++)
+        {
+            var entity = entities[i];
+            commands[i] = new RaycastCommand(transforms[entity].position + offset, direction, distance, maskValue);
+        }
+
+        RaycastCommand.ScheduleBatch(commands, results, 10).Complete();
+
+        EachJobWithRaycast<TransformComponent,B, AExecutor> job;
+
+        job.RaycastHits = results;
+        job.ItemsA = NativeMagic.WrapToNative(transforms);
+        job.ItemsB = NativeMagic.WrapToNative(b);
+        job.Entities = NativeMagic.WrapToNative(entities);
+        job.Action = jobExecute;
+        job.Schedule(entityType.Count, 0).Complete();
+
         results.Dispose();
         commands.Dispose();
 #if UNITY_EDITOR
@@ -531,45 +639,55 @@ public static partial class EcsExtensions
 #endif
     }
     
-    public static void EachWithJobRaycast<AExecutor, NA, NB>(this Entities.EntitiesWithout<NA,NB> ezs, ref AExecutor jobExecute, Vector3 direction)
-        where AExecutor : unmanaged, 
-        IJobExecute<TransformComponent, RaycastHit>
+    public static void EachWithJobRaycast<AExecutor, NA, NB, B, C>(this Entities.EntitiesWithout<NA, NB> ezs,
+        ref AExecutor jobExecute, in Vector3 direction, in Vector3 offset, LayerMask mask, float distance)
+    where C : unmanaged where B : unmanaged
+        where AExecutor : unmanaged, IJobExecute<TransformComponent,B,C, RaycastHit>
     {
-        var entityType = ezs.GetEntityTypeWithout<TransformComponent>();
+        var entityType = ezs.GetEntityTypeWithout<TransformComponent,B,C>();
         var transforms = entityType.poolA.items;
+        var b = entityType.poolB.items;
+        var c = entityType.poolС.items;
         var entities = entityType.entities;
 
-        var results = new NativeArray<RaycastHit>(transforms.Length, Allocator.Persistent);
-        var commands = new NativeArray<RaycastCommand>(transforms.Length, Allocator.Persistent);
+        var results = new NativeArray<RaycastHit>(entityType.Count, Allocator.Persistent);
+        var commands = new NativeArray<RaycastCommand>(entityType.Count, Allocator.Persistent);
+
+        var maskValue = mask.value;
         
-        for (int i = 0; i < entityType.Count; i++)
+        for (var i = 0; i < entityType.Count; i++)
         {
             var entity = entities[i];
-            commands[entity] = new RaycastCommand(transforms[entity].position, direction);
+            commands[i] = new RaycastCommand(transforms[entity].position + offset, direction, distance, maskValue);
         }
 
         RaycastCommand.ScheduleBatch(commands, results, 10).Complete();
 
-        EachJobWithRaycast<TransformComponent,AExecutor> job = default;
+        EachJobWithRaycast<TransformComponent,B,C, AExecutor> job;
+
         job.RaycastHits = results;
         job.ItemsA = NativeMagic.WrapToNative(transforms);
+        job.ItemsB = NativeMagic.WrapToNative(b);
+        job.ItemsC = NativeMagic.WrapToNative(c);
         job.Entities = NativeMagic.WrapToNative(entities);
+        job.Action = jobExecute;
         job.Schedule(entityType.Count, 0).Complete();
-        
+
         results.Dispose();
         commands.Dispose();
 #if UNITY_EDITOR
         job.Clear();
 #endif
     }
+    
     [BurstCompile]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int GetColliderID(this RaycastHit hit)
     {
         unsafe
         {
-            RaycastHitPublic h = *(RaycastHitPublic*)&hit;
-            return h.ColliderID;
+            var h = *(RaycastHitPublic*) &hit;
+            return h.m_ColliderID;
         }
     }
 }
@@ -578,27 +696,29 @@ public static partial class EcsExtensions
 [StructLayout(LayoutKind.Sequential)]
 public struct RaycastHitPublic
 {
-    public Vector3 Point;
-    public Vector3 Normal;
-    public int FaceID;
-    public float Distance;
-    public Vector2 UV;
-    public int ColliderID;
+    public Vector3 m_Point;
+    public Vector3 m_Normal;
+    public int m_FaceID;
+    public float m_Distance;
+    public Vector2 m_UV;
+    public int m_ColliderID;
 }
-public struct EachJobWithRaycast<A, Executor> : IJobParallelFor 
+
+[BurstCompile(CompileSynchronously = true)]
+public struct EachJobWithRaycast<A, Executor> : IJobParallelFor
     where Executor : unmanaged, IJobExecute<A, RaycastHit>
     where A : unmanaged
 {
-    [ReadOnly]
-    public NativeArray<RaycastHit> RaycastHits;
+    [ReadOnly] public NativeArray<RaycastHit> RaycastHits;
     public NativeWrappedData<A> ItemsA;
     public NativeWrappedData<int> Entities;
     public Executor Action;
+
     public void Execute(int index)
     {
         var entity = Entities.Array[index];
         var itemA = ItemsA.Array[entity];
-        var raycast = RaycastHits[entity];
+        var raycast = RaycastHits[index];
         Action.ForEach(ref itemA, ref raycast);
         ItemsA.Array[entity] = itemA;
     }
@@ -607,28 +727,108 @@ public struct EachJobWithRaycast<A, Executor> : IJobParallelFor
     public void Clear()
     {
         NativeMagic.UnwrapFromNative(ItemsA);
+        NativeMagic.UnwrapFromNative(Entities);
     }
-#endif 
+#endif
+}
+[BurstCompile(CompileSynchronously = true)]
+public struct EachJobWithRaycast<A,B, Executor> : IJobParallelFor
+    where Executor : unmanaged, IJobExecute<A , B, RaycastHit>
+    where A : unmanaged
+    where B : unmanaged
+
+{
+    [ReadOnly] public NativeArray<RaycastHit> RaycastHits;
+    public NativeWrappedData<A> ItemsA;
+    public NativeWrappedData<B> ItemsB;
+    public NativeWrappedData<int> Entities;
+    public Executor Action;
+
+    public void Execute(int index)
+    {
+        var entity = Entities.Array[index];
+        var itemA = ItemsA.Array[entity];
+        var itemB = ItemsB.Array[entity];
+
+        var raycast = RaycastHits[index];
+        Action.ForEach(ref itemA, ref itemB,ref raycast);
+        ItemsA.Array[entity] = itemA;
+        ItemsB.Array[entity] = itemB;
+
+    }
+#if UNITY_EDITOR
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Clear()
+    {
+        NativeMagic.UnwrapFromNative(ItemsA);
+        NativeMagic.UnwrapFromNative(ItemsB);
+
+        NativeMagic.UnwrapFromNative(Entities);
+    }
+#endif
+}
+[BurstCompile(CompileSynchronously = true)]
+public struct EachJobWithRaycast<A,B,C, Executor> : IJobParallelFor
+    where Executor : unmanaged, IJobExecute<A , B, C, RaycastHit>
+    where A : unmanaged
+    where B : unmanaged
+    where C : unmanaged
+{
+    [ReadOnly] public NativeArray<RaycastHit> RaycastHits;
+    public NativeWrappedData<A> ItemsA;
+    public NativeWrappedData<B> ItemsB;
+    public NativeWrappedData<C> ItemsC;
+    public NativeWrappedData<int> Entities;
+    public Executor Action;
+
+    public void Execute(int index)
+    {
+        var entity = Entities.Array[index];
+        var itemA = ItemsA.Array[entity];
+        var itemB = ItemsB.Array[entity];
+        var itemC = ItemsC.Array[entity];
+        var raycast = RaycastHits[index];
+        Action.ForEach(ref itemA, ref itemB,ref itemC,ref raycast);
+        ItemsA.Array[entity] = itemA;
+        ItemsB.Array[entity] = itemB;
+        ItemsC.Array[entity] = itemC;
+    }
+#if UNITY_EDITOR
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Clear()
+    {
+        NativeMagic.UnwrapFromNative(ItemsA);
+        NativeMagic.UnwrapFromNative(ItemsB);
+        NativeMagic.UnwrapFromNative(ItemsC);
+        NativeMagic.UnwrapFromNative(Entities);
+    }
+#endif
 }
 
 
+[BurstCompile(CompileSynchronously = true)]
+public struct SetupRaycastComadsJob : IJobParallelFor
+{
+    public NativeArray<RaycastCommand> Commands;
+    public NativeArray<TransformComponent> Transforms;
+    public NativeArray<int> Entities;
+    public Vector3 Offset;
+    public Vector3 Diraction;
+    public float Distance;
+    public int mask;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public void Execute(int index)
+    {
+        var entity = Entities[index];
+        var command = Commands[entity];
+        command.from = Transforms[entity].position + Offset;
+        command.direction = Diraction;
+        command.distance = Distance;
+        command.layerMask = mask;
+        Commands[entity] = command;
+    }
+}
+public interface IJobSystemTag{}
 
 /// <summary>
 ///     BIG THANKS FOR LEOPOTAM "https://github.com/Leopotam/ecslite-threads-unity"
@@ -647,7 +847,8 @@ internal static class NativeMagic
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref nativeData, sh);
             return new NativeWrappedData<T> {Array = nativeData, SafetyHandle = sh};
 #else
-            return new NativeWrappedData<T> { Array = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T> (ptr, managedData.Length, Allocator.None) };
+            return new NativeWrappedData<T> { Array =
+ NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<T> (ptr, managedData.Length, Allocator.None) };
 #endif
         }
     }
@@ -663,11 +864,8 @@ internal static class NativeMagic
 
 public struct NativeWrappedData<TT> where TT : unmanaged
 {
-        [NativeDisableParallelForRestriction] public NativeArray<TT> Array;
+    [NativeDisableParallelForRestriction] public NativeArray<TT> Array;
 #if UNITY_EDITOR
     public AtomicSafetyHandle SafetyHandle;
 #endif
 }
-
-
-    

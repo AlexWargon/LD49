@@ -4,11 +4,15 @@ using Wargon.ezs;
 
 public class EnemySpriteAnimationSystem : UpdateSystem
 {
+
+    private const float MAX_ANIMATION_DISTANCE = 80;
     public override void Update()
     {
         var dt = Time.deltaTime;
         entities.Without<Dead>().Each((Entity entity, EnemyRef enemy, SpriteAnim animation, SpriteRender render, Damage damage) =>
         {
+            if(enemy.DistanceToTarget > MAX_ANIMATION_DISTANCE) return;
+            
             var spriteRenderer = render.Value;
             var spriteAnimation = animation.Value;
             switch (enemy.State)

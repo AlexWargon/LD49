@@ -76,6 +76,7 @@ MonoBehaviour:
     00000000:
       type: {class: EnemyRef, ns: , asm: Assembly-CSharp}
       data:
+        DistanceToTarget: 0
         CurrentAttackDelay: 0
         AttackDelay: 2
         AttackRange: 4
@@ -134,7 +135,7 @@ MonoBehaviour:
       type: {class: AiPath, ns: , asm: Assembly-CSharp}
       data:
         Target: {x: 0, y: 0, z: 0}
-        MoveSpeed: 5
+        MoveSpeed: 10
         Dir: {x: 0, y: 0, z: 0}
         Offset: 1
     0000000E:
@@ -155,7 +156,7 @@ CapsuleCollider:
   m_GameObject: {fileID: 2744982186770112517}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   m_Radius: 0.5
   m_Height: 3.58
   m_Direction: 1

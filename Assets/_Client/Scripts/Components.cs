@@ -119,6 +119,7 @@ public class Impact
 [EcsComponent]
 public class EnemyRef
 {
+    public float DistanceToTarget;
     public float CurrentAttackDelay;
     public float AttackDelay;
     public float AttackRange;
@@ -130,6 +131,7 @@ public class EnemyRef
 
 public enum EnemyState
 {
+    None,
     Run,
     Attack,
     Death,

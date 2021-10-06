@@ -8,10 +8,10 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using Wargon.ezs;
 using Wargon.ezs.Unity;
-using Object = System.Object;
 
 public class Pools : MonoBehaviour
 {
+    [SerializeField] private int PoolSizeDefault = 256;
     private static Pools instance;
 
     public static Vector3 UnActivePos = new Vector3(-100000f, -100000f, 0);
@@ -166,7 +166,7 @@ public class Pools : MonoBehaviour
             return ReuseEntityNonStatic(prefab, position, rotation);
         }
 
-        CreateEntityPool(prefab, 128);
+        CreateEntityPool(prefab, PoolSizeDefault);
         return ReuseEntityNonStatic(prefab, position, rotation);
     }
     
@@ -195,7 +195,7 @@ public class Pools : MonoBehaviour
             return ReuseEntityNonStatic(prefab, position, rotation, parent);
         }
 
-        CreateEntityPoolNonStatic(prefab, 128, parent);
+        CreateEntityPoolNonStatic(prefab, PoolSizeDefault, parent);
         return ReuseEntityNonStatic(prefab, position, rotation, parent);
     }
     

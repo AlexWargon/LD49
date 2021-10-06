@@ -50,25 +50,49 @@ public class SystemsDebugEditor : Editor
         if (!EditorApplication.isPaused)
             AddDuration((float) systems.executeTime);
         systemsMonitor.Draw(systemMonitorData.ToArray(), 120f);
+        
+        
+        EditorGUILayout.BeginHorizontal(GUI.skin.box);
+        EditorGUILayout.LabelField("Systems:");
+        EditorGUILayout.LabelField("time ms:    | max time ms:");
+        EditorGUILayout.EndHorizontal();
+
+
+        var iJobSystemInteraceTag = typeof(IJobSystemTag);
+        GUIStyle burstSystemsStyle = new GUIStyle(EditorStyles.textField);
+        burstSystemsStyle.normal.textColor = new Color(1f, 0.46f, 0f);
+        
         for (var i = 0; i < systemViews.Length; i++)
         {
             systemViews[i].name = systems.Systems.updateSystemsList[i].GetType().Name;
             systemViews[i].time = systems.executeTimes[i];
             if (systemViews[i].time > systemViews[i].maxTime)
                 systemViews[i].maxTime = systemViews[i].time;
+            
+            EditorGUILayout.BeginHorizontal(GUI.skin.box);
+            if (iJobSystemInteraceTag.IsInstanceOfType(systems.Systems.updateSystemsList[i]))
+            {
+                EditorGUILayout.LabelField(systemViews[i].name, burstSystemsStyle);
+                EditorGUILayout.LabelField($"{systemViews[i].time : 0.00} ms|{systemViews[i].maxTime : 0.00} ms", burstSystemsStyle);
+            }
+            else
+            {
+                EditorGUILayout.LabelField(systemViews[i].name);
+                EditorGUILayout.LabelField($"{systemViews[i].time : 0.00} ms|{systemViews[i].maxTime : 0.00} ms");
+            }
+            EditorGUILayout.EndHorizontal();
+            
+            
         }
         //SortByTime(systemViews);
-        EditorGUILayout.BeginHorizontal(GUI.skin.box);
-        EditorGUILayout.LabelField("Systems:");
-        EditorGUILayout.LabelField("time ms:    | max time ms:");
-        EditorGUILayout.EndHorizontal();
-        for (var i = 0; i < systemViews.Length; i++)
-        {
-            EditorGUILayout.BeginHorizontal(GUI.skin.box);
-            EditorGUILayout.LabelField(systemViews[i].name);
-            EditorGUILayout.LabelField($"{systemViews[i].time : 0.00} ms|{systemViews[i].maxTime : 0.00} ms");
-            EditorGUILayout.EndHorizontal();
-        }
+
+        // for (var i = 0; i < systemViews.Length; i++)
+        // {
+        //     EditorGUILayout.BeginHorizontal(GUI.skin.box);
+        //     EditorGUILayout.LabelField(systemViews[i].name);
+        //     EditorGUILayout.LabelField($"{systemViews[i].time : 0.00} ms|{systemViews[i].maxTime : 0.00} ms");
+        //     EditorGUILayout.EndHorizontal();
+        // }
     }
 
     private SystemView[] SortByTime(SystemView[] array)

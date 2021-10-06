@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
 using DG.Tweening;
-using Unity.Burst;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
 using Wargon.ezs;
@@ -502,93 +500,10 @@ public struct EnemySprite
     public Vector3 Euler;
 }
 
-public class BurstEnemySpriteRotationSystem : UpdateSystem
-{
-    private Job j0b;
-    public override void Update()
-    {
-
-        j0b.dt = Time.deltaTime;
-        j0b.playerPosition = Servise<GameService>.Get().PlayerCaneraTransform.position;
-        j0b.playerPosition.y = 2.505f;
-        entities.Without<Dead,DeathState>().EachWithJob<Job,EnemySprite,TransformComponent,CanRotate,           
-            Dead,DeathState>(ref j0b);
-    }
-
-    struct Job : IJobExecute<EnemySprite, TransformComponent, CanRotate>
-    {
-        public float dt;
-        public Vector3 playerPosition;
-        public void ForEach(ref EnemySprite sprite, ref TransformComponent transformComponent, ref CanRotate r)
-        {
-            // sprite.Dir = (playerPosition - transformComponent.position).normalized;
-            // var rot = Quaternion.Euler(sprite.Dir);
-            // sprite.Euler = rot.eulerAngles;
-            // transformComponent.rotation = rot;
-            //
-
-            sprite.Dir = playerPosition - transformComponent.position;
-            transformComponent.rotation = Quaternion.LookRotation(sprite.Dir);
-        }
-    }
-}
 [EcsComponent] public struct CanRun{}
 [EcsComponent] public struct CanRotate{}
 [EcsComponent] public struct Dead{}
-public class BurstFlyDeadEnemySystem : UpdateSystem
-{
-    private FlyEnemyJob j0b;
-    private const float DEAD_Y_POS = 0.2f;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private Quaternion DeadRotation()
-    {
-        return Quaternion.Euler(90,Random.Range(0,360),90);
-    }
-    public override void Update()
-    {
-        j0b.deadpos = DEAD_Y_POS;
-        j0b.dt = Time.deltaTime;
-        entities.Without<CanRotate,CanRun>().EachWithJob<FlyEnemyJob, FlyWithBurst, TransformComponent, CanRotate,CanRun>(ref j0b);
-        
-        entities.Each((Entity entity, ColliderRef Collider, DeathState deathState, ref FlyWithBurst fly, ref TransformComponent transform) =>
-        {
-            if (fly.Grounded)
-            {
-                transform.rotation = DeadRotation();
-                Collider.Value.enabled = false;
-                entity.Set<Dead>();
-                entity.Set<NoBurst>();
-                entity.Remove<FlyWithBurst>();
-            }
-        });
-    }
-    struct FlyEnemyJob : IJobExecute<FlyWithBurst, TransformComponent>
-    {
-        public float deadpos;
-        public float dt;
-        private Vector3 rot;
-        public void ForEach(ref FlyWithBurst fly, ref TransformComponent transform)
-        {
-            fly.MaxTime -=dt;
-            if (!fly.Grounded)
-            {
-                transform.position += fly.Direction * fly.Force * dt;
-                fly.Delay += dt;
-                fly.Direction.y -= dt * 0.5f;
-                rot = transform.rotation.eulerAngles;
-                rot.z += fly.SpeedRotation * dt;
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, rot.z), 0.1f);
-            }
-
-            if (fly.Delay > 1 )
-            {
-                if (transform.position.y <= deadpos || fly.MaxTime < 0)
-                    fly.Grounded = true;
-            }
-        }
-    }
-}
 [EcsComponent] public class DeathState{}
 public class PostExplosionCollisionEnemySystem : UpdateSystem
 {
@@ -694,40 +609,7 @@ public struct AiPath
     public float Offset;
 }
 
-public class BurstEnemyMoveSystem : UpdateSystem
-{
-    private MoveJob job;
-    public override void Update()
-    {
-        job.target = Servise<GameService>.Get().PlayerCaneraTransform.position;
 
-        job.dt = Time.deltaTime;
-        job.offest= 2.505f;
-        entities.Without<Dead,DeathState>().EachWithJob<MoveJob, AiPath, TransformComponent, RunState, Dead, DeathState>(ref job);
-    }
-
-    struct MoveJob : IJobExecute<AiPath, TransformComponent, RunState>
-    {
-        public float offest;
-        public float dt;
-        public Vector3 target;
-        public void ForEach(ref AiPath path, ref TransformComponent transform, ref RunState r)
-        {
-            if (path.Target.x == 0)
-            {
-                transform.position = Vector3.MoveTowards(transform.position, target, dt * path.MoveSpeed);
-            }
-            else
-            {
-                transform.position = Vector3.MoveTowards(transform.position, path.Target, dt * path.MoveSpeed);
-            }
-            //path.Dir = (target- transform.position).normalized;
-            
-            //transform.position += path.Dir * path.MoveSpeed * dt;
-            //transform.position.y = offest;
-        }
-    }
-}
 
 public class EnemyMoveSystem : UpdateSystem
 {
@@ -782,25 +664,33 @@ public class EnemyAISystem : UpdateSystem
         entities.Without<Dead,DeathState>().Each((Entity entity, EnemyRef enemy, TransformRef TransformRef) =>
         {
             var transform = TransformRef.Value;
-            var distance = Vector3.Distance(transform.position, enemy.MoveToTargetValue.position);
+            enemy.DistanceToTarget = Vector3.Distance(transform.position, enemy.MoveToTargetValue.position);
             
             // if (distance > LOW_AGENT_DISTANCE)
             //     enemy.NavMeshAgentVelue.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
             // else
             //     enemy.NavMeshAgentVelue.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
             
-            if (distance < enemy.AttackRange)
+            if (enemy.DistanceToTarget < enemy.AttackRange)
             {
-                enemy.State = EnemyState.Attack;
-                //enemy.NavMeshAgentVelue.SetDestination(transform.position);
-                entity.Set<AttackState>();
-                entity.Remove<RunState>();
+                if (enemy.State != EnemyState.Attack)
+                {
+                    entity.Set<AttackState>();
+                    entity.Remove<RunState>();
+                    enemy.State = EnemyState.Attack;
+                    //enemy.NavMeshAgentVelue.SetDestination(transform.position);
+
+                }
             }
             else
             {
-                enemy.State = EnemyState.Run;
-                entity.Set<RunState>();
-                entity.Remove<AttackState>();
+                if (enemy.State != EnemyState.Run)
+                {
+                    entity.Set<RunState>();
+                    entity.Remove<AttackState>();
+                    enemy.State = EnemyState.Run;
+
+                }
             }
         });
         
@@ -957,20 +847,151 @@ public class DamagePlayerByEnemyExplosionSystem : UpdateSystem
     }
 }
 
-public class BurstCheckGroundSystem : UpdateSystem
+public class BurstCheckGroundSystem : UpdateSystem, IJobSystemTag
 {
     private JobCast job;
+    private LayerMask mask = LayerMask.GetMask("Ground");
+    private Vector3 offset = new Vector3(0, -2.3f, 0);
     public override void Update()
     {
-        entities.Without<Dead,DeathState>().EachWithJobRaycast(ref job, Vector3.down);
+        var dir = Vector3.down;
+        job.offset = offset;
+        job.dt = Time.deltaTime;
+        job.mass = 24f;
+        job.y = 2.5f;
+        entities.Without<Dead,DeathState>().EachWithJobRaycast(ref job, in dir, in offset, mask, 0.3f);
     }
     struct JobCast : IJobExecute<TransformComponent, RaycastHit>
     {
+        public float dt;
+        public float mass;
+        public Vector3 offset;
+        public float y;
         public void ForEach(ref TransformComponent transform, ref RaycastHit raycast)
         {
-            transform.position.y = raycast.distance;
-            Debug.DrawLine(transform.position, raycast.point, Color.green);
-            //Debug.Log(raycast.distance);
+            //Debug.DrawLine(transform.position, raycast.point, Color.green);
+            if (raycast.distance < 0.25f)
+            {
+                transform.position.y = raycast.point.y + y;
+            }
+            else
+            {
+                transform.position += Vector3.down * mass * dt;
+            }
+        }
+    }
+}
+public class BurstEnemyMoveSystem : UpdateSystem, IJobSystemTag
+{
+    private MoveJob job;
+    public override void Update()
+    {
+        job.target = Servise<GameService>.Get().PlayerCaneraTransform.position;
+
+        job.dt = Time.deltaTime;
+        job.offest= 2.5f;
+        entities.Without<Dead,DeathState>().EachWithJob<MoveJob, AiPath, TransformComponent, RunState, Dead, DeathState>(ref job);
+    }
+
+    struct MoveJob : IJobExecute<AiPath, TransformComponent, RunState>
+    {
+        public float offest;
+        public float dt;
+        public Vector3 target;
+        private Vector3 result;
+        public void ForEach(ref AiPath path, ref TransformComponent transform, ref RunState r)
+        {
+            result = Vector3.MoveTowards(transform.position, target, dt * path.MoveSpeed);
+            transform.position.x = result.x;
+            transform.position.z = result.z;
+        }
+    }
+}
+public class BurstFlyDeadEnemySystem : UpdateSystem, IJobSystemTag
+{
+    private FlyEnemyJob j0b;
+    private const float DEAD_Y_POS = 0.2f;
+    private readonly LayerMask mask = LayerMask.GetMask("Ground");
+    private readonly Vector3 offset = new Vector3(0, 1, 0);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private Quaternion DeadRotation()
+    {
+        return Quaternion.Euler(90,Random.Range(0,360),90);
+    }
+    public override void Update()
+    {
+        j0b.deadpos = DEAD_Y_POS;
+        var rayCastDiraction = Vector3.down;
+        j0b.dt = Time.smoothDeltaTime;
+        entities
+            .Without<CanRotate,CanRun>()
+            .EachWithJobRaycast<FlyEnemyJob, CanRotate,CanRun,FlyWithBurst>(ref j0b, in rayCastDiraction, in offset, mask, 1f);
+        
+        entities.Each((Entity entity, ColliderRef Collider, DeathState deathState, ref FlyWithBurst fly, ref TransformComponent transform) =>
+        {
+            if (fly.Grounded)
+            {
+                transform.rotation = DeadRotation();
+                Collider.Value.enabled = false;
+                entity.Set<Dead>();
+                entity.Set<NoBurst>();
+                entity.Remove<FlyWithBurst>();
+            }
+        });
+    }
+    struct FlyEnemyJob : IJobExecute<TransformComponent, FlyWithBurst,RaycastHit>
+    {
+        public float deadpos;
+        public float dt;
+        private Vector3 rot;
+        public void ForEach(ref TransformComponent transform, ref FlyWithBurst fly, ref RaycastHit raycast)
+        {
+            //Debug.DrawLine(transform.position, raycast.point, Color.green);
+            if (!fly.Grounded)
+            {
+                transform.position += fly.Direction * fly.Force * dt;
+                fly.Delay += dt;
+                fly.Direction.y -= dt * 0.5f;
+                rot = transform.rotation.eulerAngles;
+                rot.z += fly.SpeedRotation * dt;
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, rot.z), 0.1f);
+            }
+            if (fly.Delay > 1)
+            {
+                if (raycast.GetColliderID() != 0 && raycast.distance < 1f)
+                {
+                    transform.position = raycast.point;
+                    transform.position.y = 0.1f; 
+                    fly.Grounded = true;
+                }
+                // if (transform.position.y <= deadpos || fly.MaxTime < 0)
+                //     fly.Grounded = true;
+            }
+        }
+    }
+}
+
+public class BurstEnemySpriteRotationSystem : UpdateSystem, IJobSystemTag
+{
+    private Job j0b;
+    public override void Update()
+    {
+        j0b.dt = Time.deltaTime;
+        j0b.playerPosition = Servise<GameService>.Get().PlayerCaneraTransform.position;
+
+        entities.Without<Dead,DeathState>().EachWithJob<Job,EnemySprite,TransformComponent,CanRotate,           
+            Dead,DeathState>(ref j0b);
+    }
+
+    struct Job : IJobExecute<EnemySprite, TransformComponent, CanRotate>
+    {
+        public float dt;
+        public Vector3 playerPosition;
+        public void ForEach(ref EnemySprite sprite, ref TransformComponent transformComponent, ref CanRotate r)
+        {
+            playerPosition.y = transformComponent.position.y;
+            sprite.Dir = playerPosition - transformComponent.position;
+            transformComponent.rotation = Quaternion.LookRotation(sprite.Dir);
         }
     }
 }
