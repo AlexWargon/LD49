@@ -113,7 +113,7 @@ NavMeshSettings:
     agentSlope: 56.1
     agentClimb: 2.1
     ledgeDropHeight: 6
-    maxJumpAcrossDistance: 0
+    maxJumpAcrossDistance: 3
     minRegionArea: 2
     manualCellSize: 0
     cellSize: 0.16666667
@@ -124,7 +124,7 @@ NavMeshSettings:
     preserveTilesOutsideBounds: 0
     debug:
       m_Flags: 0
-  m_NavMeshData: {fileID: 0}
+  m_NavMeshData: {fileID: 23800000, guid: eb2ea086c1e49544185cd9ad186547cd, type: 2}
 --- !u!4 &335283 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1856274294342217161, guid: 2fdf80ce10a75fa4b909e98c5f6b1e06,
@@ -7172,7 +7172,7 @@ PrefabInstance:
     - target: {fileID: 3856945881406288969, guid: a0306a0ab5cc64f468d766f0c60bf580,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 1.16
       objectReference: {fileID: 0}
     - target: {fileID: 3856945881406288969, guid: a0306a0ab5cc64f468d766f0c60bf580,
         type: 3}
@@ -7247,7 +7247,7 @@ PrefabInstance:
     - target: {fileID: 7167067905711618100, guid: a0306a0ab5cc64f468d766f0c60bf580,
         type: 3}
       propertyPath: Components.Array.data[3].Value
-      value: 9999999
+      value: 1000
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a0306a0ab5cc64f468d766f0c60bf580, type: 3}
