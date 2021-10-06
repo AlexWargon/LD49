@@ -50,7 +50,7 @@ public class GameEcs : MonoBehaviour
                 
                 
                 .Add(new EnemyMoveSystem())
-                //.Add(new BurstEnemySpriteRotationSystem())
+                .Add(new BurstEnemySpriteRotationSystem())
                 //.Add(new BurstEnemyMoveSystem())
                 .Add(new BurstCheckGroundSystem())
                 .Add(new DeadEnemyLayDownCountDonwSystem())
@@ -619,28 +619,30 @@ public class EnemyMoveSystem : UpdateSystem
     {
 
         delay += Time.deltaTime;
-        entities.Without<Dead>().Each((EnemyRef enemyRef, RunState runState, NoBurst tag, ref AiPath path) =>
+
+        if (delay > constDelayt)
         {
-            if (delay > constDelayt)
+            
+            //if(enemyRef.NavMeshAgentVelue.isOnNavMesh)
+                    
+            //if(enemyRef.NavMeshAgentVelue.isOnNavMesh)
+            // enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
+            // if (enemyRef.NavMeshAgentVelue.isOnNavMesh)
+            // {
+            //     enemyRef.NavMeshAgentVelue.CalculatePath(enemyRef.MoveToTargetValue.position,
+            //         enemyRef.NavMeshAgentVelue.path);
+            //     //enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
+            //     if(enemyRef.NavMeshAgentVelue.path.corners.Length > 0)
+            //         path.Target = enemyRef.NavMeshAgentVelue.path.corners[0];
+            // }
+            entities.Without<Dead>().Each((EnemyRef enemyRef, RunState runState, ref NoBurst tag) =>
             {
                 enemyRef.NavMeshAgentVelue.SetDestination(enemyRef.MoveToTargetValue.position);
-                //if(enemyRef.NavMeshAgentVelue.isOnNavMesh)
-                    
-                //if(enemyRef.NavMeshAgentVelue.isOnNavMesh)
-                // enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
-                // if (enemyRef.NavMeshAgentVelue.isOnNavMesh)
-                // {
-                //     enemyRef.NavMeshAgentVelue.CalculatePath(enemyRef.MoveToTargetValue.position,
-                //         enemyRef.NavMeshAgentVelue.path);
-                //     //enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
-                //     if(enemyRef.NavMeshAgentVelue.path.corners.Length > 0)
-                //         path.Target = enemyRef.NavMeshAgentVelue.path.corners[0];
-                // }
-
-                delay = 0f;
-                //path.Target = enemyRef.NavMeshAgentVelue.path.corners[0];
-            }
-        });
+                
+            });
+            delay = 0f;
+            //path.Target = enemyRef.NavMeshAgentVelue.path.corners[0];
+        }
     }
 }
 
@@ -910,7 +912,7 @@ public class BurstEnemyMoveSystem : UpdateSystem, IJobSystemTag
 }
 public class BurstFlyDeadEnemySystem : UpdateSystem, IJobSystemTag
 {
-    public static Vector3 Offest = new Vector3(0f, 0.2f, 0f);
+    private readonly static Vector3 Offest = new Vector3(0f, 0.2f, 0f);
     private FlyEnemyJob j0b;
     private const float DEAD_Y_POS = 0.2f;
     private readonly LayerMask mask = LayerMask.GetMask("Ground");
