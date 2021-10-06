@@ -55,6 +55,7 @@ public class EnemySpawner : MonoBehaviour
             enemy.Entity.Set<CanRotate>();
             enemy.Entity.Set<CanRun>();
             enemy.Entity.Get<ColliderRef>().Value.enabled = true;
+            enemy.Entity.Get<EnemyRef>().NavMeshAgentVelue.enabled = true;
             enemy.Entity.Add(new EnemySpawnEvent());
         }
     }
