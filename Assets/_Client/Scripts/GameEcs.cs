@@ -19,7 +19,8 @@ public class GameEcs : MonoBehaviour
     
     private void Awake()
     {
-
+        Time.timeScale = 1;
+        Application.targetFrameRate = 144;
         World = new World();
         MonoConverter.Init(World);
 
@@ -50,7 +51,7 @@ public class GameEcs : MonoBehaviour
                 
                 
                 .Add(new EnemyMoveSystem())
-                .Add(new BurstEnemySpriteRotationSystem())
+                //.Add(new BurstEnemySpriteRotationSystem())
                 //.Add(new BurstEnemyMoveSystem())
                 .Add(new BurstCheckGroundSystem())
                 .Add(new DeadEnemyLayDownCountDonwSystem())
@@ -526,7 +527,7 @@ public class PostExplosionCollisionEnemySystem : UpdateSystem
             ui.AddKills();
             //enemy.NavMeshAgentVelue.enabled = false;
             var dir = (transformRef.Value.position - damaged.From).normalized;
-            if (dir.y < 0.1f)
+            if (dir.y < 0.2f)
                 dir.y = Random.Range(0.4f, 1f);
             float rSpeed;
             if (dir.x > 0)
@@ -537,10 +538,11 @@ public class PostExplosionCollisionEnemySystem : UpdateSystem
             {
                 Direction = dir,
                 Force = damaged.Power,
-                MaxTime =  10f,
+                MaxTime =  6f,
                 SpeedRotation =  rSpeed
             };
-            
+            entity.Get<ColliderRef>().Value.enabled = false;
+            entity.Get<EnemyRef>().NavMeshAgentVelue.enabled = false;
             ref var transform = ref entity.GetRef<TransformComponent>();
             transform.position = transformRef.Value.position;
             transform.rotation = transformRef.Value.rotation;
@@ -929,19 +931,15 @@ public class BurstFlyDeadEnemySystem : UpdateSystem, IJobSystemTag
         j0b.dt = Time.smoothDeltaTime;
         entities
             .Without<CanRotate,CanRun>()
-            .EachWithJobRaycast<FlyEnemyJob, CanRotate,CanRun,FlyWithBurst>(ref j0b, in rayCastDiraction, in offset, mask, 1f);
+            .EachWithJobRaycast<FlyEnemyJob, CanRotate,CanRun,FlyWithBurst>(ref j0b, in rayCastDiraction, in offset, mask, 0.5f);
         
-        entities.Each((Entity entity, ColliderRef Collider, DeathState deathState, ref TransformRef transform, ref FlyWithBurst fly) =>
+        entities.Each((Entity entity, DeathState deathState, TransformRef transform, ref FlyWithBurst fly) =>
         {
             if (fly.Grounded)
             {
-                Debug.Log("SSS");
-                entity.Get<EnemyRef>().NavMeshAgentVelue.enabled = false;
                 transform.Value.position = entity.Get<TransformComponent>().position;
                 transform.Value.rotation = DeadRotation();
-                Collider.Value.enabled = false;
                 entity.Get<EnemyRef>().State = EnemyState.Dead;
-                
                 entity.Set<Dead>();
                 entity.Set<NoBurst>();
                 entity.Remove<FlyWithBurst>();
@@ -956,6 +954,7 @@ public class BurstFlyDeadEnemySystem : UpdateSystem, IJobSystemTag
         
         public void ForEach(ref TransformComponent transform, ref FlyWithBurst fly, ref RaycastHit raycast)
         {
+            fly.MaxTime -= dt;
             //Debug.DrawLine(transform.position, raycast.point, Color.green);
             if (!fly.Grounded)
             {
@@ -966,18 +965,23 @@ public class BurstFlyDeadEnemySystem : UpdateSystem, IJobSystemTag
                 rot.z += fly.SpeedRotation * dt;
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, rot.z), 0.1f);
             }
-            if (fly.Delay > 1)
+            if (fly.Delay > 0.2f)
             {
-                if (raycast.GetColliderID() != 0 && raycast.distance < 0.2f)
+                if (raycast.GetColliderID() != 0 && raycast.distance < 0.3f)
                 {
                     transform.position = raycast.point;
                     transform.position += BurstFlyDeadEnemySystem.Offest;
-                    Debug.Log($"point {raycast.point}");
-                    Debug.Log($"transform.position {transform.position}");
                     fly.Grounded = true;
                 }
-                // if (transform.position.y <= deadpos || fly.MaxTime < 0)
-                //     fly.Grounded = true;
+                else
+                if(transform.position.y < 0.3f)
+                {
+                    transform.position = raycast.point;
+                    transform.position.y = deadpos;
+                    fly.Grounded = true;
+                }
+                if (fly.MaxTime < 0)
+                    fly.Grounded = true;
             }
         }
     }
