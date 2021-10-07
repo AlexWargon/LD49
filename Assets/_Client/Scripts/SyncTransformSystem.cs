@@ -6,7 +6,7 @@ using UnityEngine.Jobs;
 using Wargon.ezs;
 using Wargon.ezs.Unity;
 
-public class SyncTransformSystem : UpdateSystem
+public class SyncTransformSystem : UpdateSystem, IJobSystemTag
 {
     private class Transforms : EntityType
     {
@@ -22,10 +22,10 @@ public class SyncTransformSystem : UpdateSystem
                 ComponentType<TransformComponent>.ID,
                 ComponentType<TransformRef>.ID
             };
-            ExludeCount = 2;
+            ExludeCount = 1;
             ExcludeTypes = new[] {
-                ComponentType<UnActive>.ID,
-                ComponentType<NoBurst>.ID
+                ComponentType<UnActive>.ID//,
+                //ComponentType<NoBurst>.ID
             };
             structComponents = world.GetPool<TransformComponent>();
             classComponents = world.GetPool<TransformRef>();
@@ -38,9 +38,9 @@ public class SyncTransformSystem : UpdateSystem
             var PoolEx = world.GetPool<UnActive>();
             PoolEx.OnAdd += OnAddExclude;
             PoolEx.OnRemove += OnRemoveExclude;
-            var PoolEx2 = world.GetPool<NoBurst>();
-            PoolEx2.OnAdd += OnAddExclude;
-            PoolEx2.OnRemove += OnRemoveExclude;
+            // var PoolEx2 = world.GetPool<NoBurst>();
+            // PoolEx2.OnAdd += OnAddExclude;
+            // PoolEx2.OnRemove += OnRemoveExclude;
             world.OnCreateEntityType(this);
         }
 
@@ -194,7 +194,7 @@ public class SyncTransformSystem : UpdateSystem
     {
         base.Init(entities, world);
         transforms = new Transforms(world);
-        entities.Without<UnActive,NoBurst>().EntityTypes.Add( typeof(Transforms), transforms);
+        entities.Without<UnActive>().EntityTypes.Add( typeof(Transforms), transforms);
     }
 
     public override void Update()

@@ -16,8 +16,11 @@ public class LoadNextScene : MonoBehaviour
         if (_enemySettingSlider != null)
         {
             _enemySettingSlider.onValueChanged.AddListener(delegate { EnemyPoolValueSetting(); });
-            var value = _enemySettingSlider.value / 0.0003333;
+            var savedValue = EnemyStaticPoolValue.EnemyPoolValue;
+            if (savedValue != 0)
+                _enemySettingSlider.value = savedValue;
 
+            var value = _enemySettingSlider.value;
             int vIntValue = (int)value;
             textEnemyCounr.text = vIntValue.ToString();
             EnemyStaticPoolValue.EnemyPoolValue = vIntValue;
@@ -47,7 +50,7 @@ public class LoadNextScene : MonoBehaviour
 
     public void EnemyPoolValueSetting()
     {
-        var value= _enemySettingSlider.value / 0.0003333;
+        var value= _enemySettingSlider.value;
 
         int vIntValue = (int)value;
         textEnemyCounr.text = vIntValue.ToString();

@@ -4,5 +4,9 @@ using UnityEngine;
 
 public static class EnemyStaticPoolValue
 {
-    public static int EnemyPoolValue;
+    public static int EnemyPoolValue
+    {
+        get => PlayerPrefs.GetInt("EnemyPoolValue");
+        set => PlayerPrefs.SetInt("EnemyPoolValue", value);
+    }
 }

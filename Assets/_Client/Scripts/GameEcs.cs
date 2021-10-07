@@ -51,8 +51,8 @@ public class GameEcs : MonoBehaviour
                 
                 
                 .Add(new EnemyMoveSystem())
-                //.Add(new BurstEnemySpriteRotationSystem())
-                //.Add(new BurstEnemyMoveSystem())
+                .Add(new BurstEnemySpriteRotationSystem())
+                .Add(new BurstEnemyMoveSystem())
                 .Add(new BurstCheckGroundSystem())
                 .Add(new DeadEnemyLayDownCountDonwSystem())
                 
@@ -616,13 +616,13 @@ public struct AiPath
 public class EnemyMoveSystem : UpdateSystem
 {
     private float delay;
-    private float constDelayt = 0.5f;
+    private const float DELAY_TO_FIND_PATH = 0.5f;
     public override void Update()
     {
 
         delay += Time.deltaTime;
 
-        if (delay > constDelayt)
+        if (delay > DELAY_TO_FIND_PATH)
         {
             
             //if(enemyRef.NavMeshAgentVelue.isOnNavMesh)
@@ -637,10 +637,18 @@ public class EnemyMoveSystem : UpdateSystem
             //     if(enemyRef.NavMeshAgentVelue.path.corners.Length > 0)
             //         path.Target = enemyRef.NavMeshAgentVelue.path.corners[0];
             // }
-            entities.Without<Dead>().Each((EnemyRef enemyRef, RunState runState, ref NoBurst tag) =>
+            entities.Without<Dead>().Each((EnemyRef enemyRef, RunState runState, NoBurst tag, ref AiPath path) =>
             {
-                enemyRef.NavMeshAgentVelue.SetDestination(enemyRef.MoveToTargetValue.position);
-                
+                //enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
+                if (enemyRef.NavMeshAgentVelue.isOnNavMesh)
+                {
+                    enemyRef.NavMeshAgentVelue.CalculatePath(enemyRef.MoveToTargetValue.position,
+                        enemyRef.NavMeshAgentVelue.path);
+                    //enemyRef.NavMeshAgentVelue.destination = enemyRef.MoveToTargetValue.position;
+                    if(enemyRef.NavMeshAgentVelue.path.corners.Length > 0)
+                        path.Target = enemyRef.NavMeshAgentVelue.path.corners[0];
+                }
+
             });
             delay = 0f;
             //path.Target = enemyRef.NavMeshAgentVelue.path.corners[0];
@@ -671,10 +679,10 @@ public class EnemyAISystem : UpdateSystem
             var transform = TransformRef.Value;
             enemy.DistanceToTarget = Vector3.Distance(transform.position, enemy.MoveToTargetValue.position);
             
-            // if (distance > LOW_AGENT_DISTANCE)
-            //     enemy.NavMeshAgentVelue.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
-            // else
-            //     enemy.NavMeshAgentVelue.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
+            if (enemy.DistanceToTarget > LOW_AGENT_DISTANCE)
+                enemy.NavMeshAgentVelue.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
+            else
+                enemy.NavMeshAgentVelue.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
             
             if (enemy.DistanceToTarget < enemy.AttackRange)
             {
@@ -684,7 +692,6 @@ public class EnemyAISystem : UpdateSystem
                     entity.Remove<RunState>();
                     enemy.State = EnemyState.Attack;
                     //enemy.NavMeshAgentVelue.SetDestination(transform.position);
-
                 }
             }
             else
@@ -839,7 +846,6 @@ public class DamagePlayerByEnemyExplosionSystem : UpdateSystem
     {
         entities.Without<Dead>().Each((Entity entity, Health Health, Damaged damaged) =>
         {
-            Debug.Log(damaged.Damage);
             Health.Value -= damaged.Damage;
             if (Health.Value <= 0)
             {
@@ -904,11 +910,10 @@ public class BurstEnemyMoveSystem : UpdateSystem, IJobSystemTag
         public float dt;
         public Vector3 target;
         private Vector3 result;
-        public void ForEach(ref AiPath path, ref TransformComponent transform, ref RunState r)
+        public void ForEach(ref AiPath path, ref TransformComponent transform, ref RunState runState)
         {
-            result = Vector3.MoveTowards(transform.position, target, dt * path.MoveSpeed);
-            transform.position.x = result.x;
-            transform.position.z = result.z;
+            //result = Vector3.MoveTowards(transform.position, path.Target, dt * path.MoveSpeed);
+            transform.position = Vector3.MoveTowards(transform.position, path.Target, dt * path.MoveSpeed);
         }
     }
 }
@@ -933,12 +938,11 @@ public class BurstFlyDeadEnemySystem : UpdateSystem, IJobSystemTag
             .Without<CanRotate,CanRun>()
             .EachWithJobRaycast<FlyEnemyJob, CanRotate,CanRun,FlyWithBurst>(ref j0b, in rayCastDiraction, in offset, mask, 0.5f);
         
-        entities.Each((Entity entity, DeathState deathState, TransformRef transform, ref FlyWithBurst fly) =>
+        entities.Each((Entity entity, DeathState deathState, FlyWithBurst fly, ref TransformComponent transform) =>
         {
             if (fly.Grounded)
             {
-                transform.Value.position = entity.Get<TransformComponent>().position;
-                transform.Value.rotation = DeadRotation();
+                transform.rotation = DeadRotation();
                 entity.Get<EnemyRef>().State = EnemyState.Dead;
                 entity.Set<Dead>();
                 entity.Set<NoBurst>();
