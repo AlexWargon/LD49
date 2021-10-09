@@ -14,13 +14,20 @@ namespace Wargon.ezs
             return new T();
         }
     }
+    public interface ICustomPool
+    {
+        int PoolType { get; set; }
+
+        void Clear();
+    }
+    
     [Serializable]
     public class Pool<T> : IPool
     {
         public T[] items;
         public int length;
         public int TypeID;
-        private int[] cachedSize;
+
         public Pool(int size)
         {
             items = new T[size];
@@ -303,7 +310,18 @@ namespace Wargon.ezs
             Value = typeof(T);
         }
     }
-
+    internal static class CustomPoolsCount
+    {
+        public static int Value;
+    }
+    internal static class CustomPoolID<T>
+    {
+        public static int Value;
+        static CustomPoolID()
+        {
+            Value = CustomPoolsCount.Value++;
+        }
+    }
     public static class ComponentTypeMap
     {
         private static Dictionary<Type, int> TypeID;

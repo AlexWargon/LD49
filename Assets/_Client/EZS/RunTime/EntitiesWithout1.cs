@@ -481,6 +481,25 @@ namespace Wargon.ezs
                 });
             }
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public new void EachThreaded<A, B, C, D>(LambdaCCCR<A, B, C, D> lambda)
+            {
+                var entityType = GetEntityTypeWithout<A, B, C, D>();
+                var entities = entityType.entities;
+                var a = entityType.poolA.items;
+                var b = entityType.poolB.items;
+                var c = entityType.poolС.items;
+                var d = entityType.poolD.items;
+                Parallel.For(0, entityType.Count, index =>
+                {
+                    var entity = entities[index];
+                    lambda(
+                        a[entity],
+                        b[entity],
+                        c[entity],
+                        ref d[entity]);
+                });
+            }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public new void EachThreaded<A, B, C, D, E>(Lambda<A, B, C, D, E> lambda)
             {
                 var entities = GetEntityTypeWithout<A, B, C, D, E>();

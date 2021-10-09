@@ -54,7 +54,9 @@ namespace Wargon.ezs
         private TypeMap<int, Systems> systems;
         private int systemsCount;
         private int freeEntitiesCount = 0;
+        private int customPoolsCount;
         private event Action OnDestroy;
+        private ICustomPool[] customPools;
         public int GetFreeEntitiesCount() => freeEntities.Count;
         public World()
         {
@@ -63,6 +65,7 @@ namespace Wargon.ezs
             PoolsCacheSize = Configs.PoolsCacheSize;
             EntityTypesCachSize = Configs.EntityTypesCacheSize;
             ComponentPools = new IPool[PoolsCacheSize];
+            customPools = new ICustomPool[PoolsCacheSize];
             entitiesData = new EntityData[EntityCacheSize];
             entities = new Entity[EntityCacheSize];
             freeEntities = new GrowList<int>(EntityCacheSize);
@@ -72,7 +75,7 @@ namespace Wargon.ezs
             ComponentTypeMap.Init(this);
             Alive = true;
         }
-
+        
         public void AddSystems(Systems add)
         {
             add.id = systemsCount;
@@ -97,6 +100,10 @@ namespace Wargon.ezs
             Array.Clear(entitiesData, 0, entitiesCount);
             Array.Clear(freeEntities.Items, 0, freeEntitiesCount);
             Array.Clear(ComponentPools, 0, ComponentPools.Length);
+            for (var i = 0; i < customPoolsCount; i++)
+            {
+                customPools[i].Clear();
+            }
             Entities.Clear();
             systems.Clear();
             entitiesCount = 0;
@@ -192,7 +199,20 @@ namespace Wargon.ezs
             }
             return pool;
         }
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T GetCustomPool<T>() where T : ICustomPool
+        {
+            var typeIdx = CustomPoolID<T>.Value;
+            var pool = customPools[typeIdx];
+            return (T)pool;
+        }
+        public World AddCustomPool<T>(T pool) where T : ICustomPool
+        {
+            pool.PoolType = CustomPoolID<T>.Value;
+            customPoolsCount = pool.PoolType;
+            customPools[customPoolsCount] = pool;
+            return this;
+        }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Entity GetEntity(int id)
         {

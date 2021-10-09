@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SphereWhite
+  m_Name: Test2
   m_Shader: {fileID: -6465566751694194690, guid: 0da31993cf66d1746970df2d6786ee67,
     type: 3}
   m_ShaderKeywords: 
@@ -25,7 +25,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: 73ad01cf98af75f46880d7d88b3ce234, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -45,7 +45,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 077b8a4d36b1922498ba737c4b4b76eb, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -77,12 +77,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - Vector1_2f927142afcb4950b7c13eb2470b158c: 0.2
-    - Vector1_5a3127088fb640bfbc7389a279ffa03a: 4.59
-    - Vector1_69a5842308d1472fafd11b5e5980012d: 9.37
-    - Vector1_76a88d87408e491c825cc375cc592ba3: 0.2
-    - Vector1_86e8215c879649b082033e4b41f4e17a: 0
-    - Vector1_b8ec7ee16346451193b3022279427337: 0
+    - Vector1_69a5842308d1472fafd11b5e5980012d: 11.36
+    - Vector1_b8ec7ee16346451193b3022279427337: 1.17
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -110,15 +106,12 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - Color_35c6af0f137c4d138fed1bf323a9ef8d: {r: 0.816, g: 0.362, b: 0, a: 0}
-    - Color_3e4c25ef5e484ca6a6d5a446f51f54db: {r: 0, g: 0, b: 0, a: 0}
-    - Color_52042a8ff8304cf89dc3a70ce0386224: {r: 1, g: 0.2783019, b: 0.2783019, a: 0}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
---- !u!114 &2875766195440688225
+--- !u!114 &8742235736813595284
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

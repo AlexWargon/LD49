@@ -127,6 +127,7 @@ public class EnemyRef
     public Transform MoveToTargetValue;
     public NavMeshAgent NavMeshAgentVelue;
     public EnemyState State;
+    public NavMeshPath Path;
 }
 
 public enum EnemyState

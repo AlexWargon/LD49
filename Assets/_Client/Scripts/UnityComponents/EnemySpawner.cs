@@ -21,7 +21,7 @@ public class EnemySpawner : MonoBehaviour
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void SpawnEnemies()
     {
-        PoolSize = EnemyStaticPoolValue.EnemyPoolValue;
+        //PoolSize = EnemyStaticPoolValue.EnemyPoolValue;
         StartCoroutine(Spawn());
     }
 
