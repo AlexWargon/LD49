@@ -561,6 +561,10 @@ public class PostExplosionCollisionEnemySystem : UpdateSystem
             entity.Remove<CanRotate>();
             entity.Remove<CanRun>();
             entity.Set<DeathState>();
+            var sprite = entity.Get<SpriteEntity>().Value;
+            sprite.Entity.Remove<EnemySprite>();
+            var spriteTransform = sprite.transform;
+            spriteTransform.rotation = Quaternion.identity;
 
             entity.Add(flyForce);
         });
@@ -943,11 +947,12 @@ public class BurstFlyDeadEnemySystem : UpdateSystem, IJobSystemTag
         j0b.dt = Time.smoothDeltaTime;
         entities.Without<CanRotate,CanRun>().EachWithJobRaycast<FlyEnemyJob, CanRotate,CanRun,FlyWithBurst>(ref j0b, in rayCastDiraction, in offset, mask, 0.5f);
 
-        entities.Each((Entity entity, DeathState deathState, FlyWithBurst fly, ref TransformComponent transform) =>
+        entities.Each((Entity entity, DeathState deathState, FlyWithBurst fly, TransformRef transform) =>
         {
             if (fly.Grounded)
             {
-                transform.rotation = DeadRotation();
+                entity.Get<SpriteEntity>().Value.transform.rotation = Quaternion.identity;
+                transform.Value.rotation = DeadRotation();
                 entity.Get<EnemyRef>().State = EnemyState.Dead;
                 entity.Set<Dead>();
                 entity.Set<NoBurst>();
@@ -1008,8 +1013,8 @@ public class BurstEnemySpriteRotationSystem : UpdateSystem, IJobSystemTag
     public override void Init(Entities entities, World world)
     {
         base.Init(entities, world);
-        transforms = new Transforms<EnemySprite>(world);
-        entities.EntityTypes.Add(type<Transforms<EnemySprite>>.Value, transforms);
+        transforms = new Transforms<EnemySprite>.WithOut<NoBurst>(world);
+        entities.Without<NoBurst>().EntityTypes.Add(type<Transforms<EnemySprite>.WithOut<NoBurst>>.Value, transforms);
     }
 
     public override void Update()

@@ -213,6 +213,7 @@ MonoBehaviour:
   - id: 11
   - id: 12
   - id: 13
+  - id: 14
   runTime: 0
   destroyObject: 0
   destroyComponent: 0
@@ -288,6 +289,10 @@ MonoBehaviour:
         MoveSpeed: 9
         Dir: {x: 0, y: 0, z: 0}
         Offset: 1
+    0000000E:
+      type: {class: SpriteEntity, ns: , asm: Assembly-CSharp}
+      data:
+        Value: {fileID: 6775196765913195610}
 --- !u!136 &8038306348812378494
 CapsuleCollider:
   m_ObjectHideFlags: 0

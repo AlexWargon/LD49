@@ -67,6 +67,7 @@ MonoBehaviour:
   - id: 13
   - id: 14
   - id: 15
+  - id: 16
   runTime: 0
   destroyObject: 0
   destroyComponent: 0
@@ -142,6 +143,10 @@ MonoBehaviour:
       type: {class: CanRotate, ns: , asm: Assembly-CSharp}
     0000000F:
       type: {class: CanRun, ns: , asm: Assembly-CSharp}
+    00000010:
+      type: {class: SpriteEntity, ns: , asm: Assembly-CSharp}
+      data:
+        Value: {fileID: 7671859606893986239}
 --- !u!136 &1944518598305511157
 CapsuleCollider:
   m_ObjectHideFlags: 0

@@ -57,6 +57,12 @@ public class EnemySpawner : MonoBehaviour
             enemy.Entity.Set<CanRun>();
             enemy.Entity.Get<ColliderRef>().Value.enabled = true;
             enemy.Entity.Get<EnemyRef>().NavMeshAgentVelue.enabled = true;
+            var sprite = enemy.Entity.Get<SpriteEntity>().Value;
+            if (!sprite.runTime)
+            {
+                sprite.ConvertToEntity();
+            }
+            sprite.Entity.Set<EnemySprite>();
             enemy.Entity.Add(new EnemySpawnEvent());
         }
     }
@@ -84,7 +90,7 @@ public class EnemySpawner : MonoBehaviour
         {
             if (rangeEnemyEventSpawn == 15)
             {
-                var monoEntity = Instantiate(RangeEnemy, spawnVector, Quaternion.identity, thisTransform);
+                var monoEntity = Instantiate(RangeEnemy, spawnVector, Quaternion.identity);
                 monoEntity.ConvertToEntity();
                 //monoEntity.Get<EnemyRef>().NavMeshAgentVelue.enabled = false;
                 monoEntity.Entity.Set<Dead>();
@@ -95,7 +101,7 @@ public class EnemySpawner : MonoBehaviour
             }
             else
             {
-                var monoEntity = Instantiate(MeleeEnemy, spawnVector, Quaternion.identity, thisTransform);
+                var monoEntity = Instantiate(MeleeEnemy, spawnVector, Quaternion.identity);
                 monoEntity.ConvertToEntity();
                 //monoEntity.Get<EnemyRef>().NavMeshAgentVelue.enabled = false;
                 monoEntity.Entity.Set<Dead>();
