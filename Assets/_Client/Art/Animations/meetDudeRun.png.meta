@@ -48,6 +48,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -292,6 +293,15 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      meetDudeRun_5: -5727719332741197501
+      meetDudeRun_0: -7847531332938279751
+      meetDudeRun_4: 981766133556694078
+      meetDudeRun_6: 7673891530816703019
+      meetDudeRun_1: -6370610143109248245
+      meetDudeRun_2: 7004039449213930739
+      meetDudeRun_3: -8270701052329089707
+      meetDudeRun_7: 2109834691165800173
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

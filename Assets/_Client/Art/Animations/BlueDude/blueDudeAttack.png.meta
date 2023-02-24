@@ -87,6 +87,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -604,6 +605,28 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      blueDudeAttack_11: 569880682660826118
+      blueDudeAttack_3: 6347914743883024031
+      blueDudeAttack_10: -5830073239493068051
+      blueDudeAttack_15: 5172309377021537125
+      blueDudeAttack_17: -419161019944565363
+      blueDudeAttack_7: -1184076716430035195
+      blueDudeAttack_9: 4414302153868988309
+      blueDudeAttack_18: -478476435002665979
+      blueDudeAttack_12: -2527952070052056317
+      blueDudeAttack_2: 7768678690537263571
+      blueDudeAttack_1: 6352069709842202515
+      blueDudeAttack_8: -1758627977366754080
+      blueDudeAttack_4: 2216989089051827563
+      blueDudeAttack_13: 2684449747795480561
+      blueDudeAttack_14: 8510866908803767496
+      blueDudeAttack_19: -2210286178329531793
+      blueDudeAttack_6: -228990080279433440
+      blueDudeAttack_0: 5156112122718422141
+      blueDudeAttack_5: -5618967750058719584
+      blueDudeAttack_16: -4189197477307432472
+      blueDudeAttack_20: 540731376646138733
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
